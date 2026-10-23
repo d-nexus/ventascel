@@ -1,0 +1,12 @@
+{
+  "name": "ventascell",
+  "version": "1.0.0",
+  "description": "Tienda online VentasCel — catálogo dinámico gestionado desde products.json",
+  "private": true,
+  "scripts": {
+    "build": "node build-catalog.js",
+    "serve": "python3 -m http.server 8080",
+    "test": "node --test"
+  },
+  "license": "UNLICENSED"
+}
