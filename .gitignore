@@ -1,0 +1,13 @@
+# Archivos de entorno y configuración sensible
+env.js
+opencode.json
+
+# Scripts de administración e infraestructura interna
+create-admin-user.js
+migrate-to-supabase.js
+build-catalog.js
+
+# Documentación interna y contexto del agente
+AGENTS.md
+MEMORY.md
+specs/
