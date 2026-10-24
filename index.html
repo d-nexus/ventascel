@@ -2,7 +2,7 @@
 <html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>VentasCel | Tienda Online de Tecnología y Dispositivos Premium</title>
     <meta name="description" content="Descubre la mejor tecnología, smartphones, accesorios, audio y electrodomésticos en VentasCel. Envíos garantizados y atención personalizada por WhatsApp.">
     
@@ -2179,16 +2179,21 @@
            Los tokens --ad-* viven solo dentro del panel y siguen
            el tema claro/oscuro de la tienda.
            ========================================== */
-        .admin-overlay { padding: 0; }
+        .admin-overlay { padding: 0; overflow: hidden; overscroll-behavior: none; touch-action: manipulation; }
         .admin-login { margin: 1rem; }
 
         .admin-panel {
-            --ad-bg: #0a0f1c;
-            --ad-card: #111a2e;
-            --ad-card-2: #17223b;
-            --ad-line: rgba(255, 255, 255, 0.08);
+            color-scheme: dark;
+            --ad-bg: #070b14;
+            --ad-card: #111b30;
+            --ad-card-2: #18243f;
+            --ad-line: rgba(255, 255, 255, 0.10);
+            --ad-line-strong: rgba(255, 255, 255, 0.20);
+            --ad-link: #60a5fa;
+            --ad-btn: #2563eb;
+            --ad-btn-hover: #1d4ed8;
             --ad-text: #f1f5f9;
-            --ad-muted: #94a3b8;
+            --ad-muted: #9fb0c8;
             --ad-side: #060b17;
             --ad-side-text: #9fb0cf;
             --ad-brand: #3b82f6;
@@ -2214,8 +2219,11 @@
             --border: var(--ad-line);
             --text-primary: var(--ad-text);
             --text-secondary: var(--ad-muted);
-            --accent: var(--ad-brand);
-            --accent-hover: #2563eb;
+            --accent: var(--ad-link);
+            --accent-hover: var(--ad-btn-hover);
+            --surface: var(--ad-card);
+            --surface-3: var(--ad-line);
+            --text: var(--ad-text);
             --accent-glow: rgba(59, 130, 246, 0.3);
             --danger: #ef4444;
             --warning: #f59e0b;
@@ -2235,12 +2243,15 @@
             position: relative;
         }
         [data-theme="light"] .admin-panel {
-            --ad-bg: #eef2f8;
+            color-scheme: light;
+            --ad-bg: #e8edf5;
             --ad-card: #ffffff;
-            --ad-card-2: #f4f7fb;
-            --ad-line: rgba(15, 23, 42, 0.09);
+            --ad-card-2: #f1f5fa;
+            --ad-line: rgba(15, 23, 42, 0.12);
+            --ad-line-strong: rgba(15, 23, 42, 0.26);
+            --ad-link: #1d4ed8;
             --ad-text: #0f172a;
-            --ad-muted: #5b6b82;
+            --ad-muted: #526074;
             --ad-side: #0f1a3a;
             --ad-up: #15803d;
             --ad-down: #be123c;
@@ -2417,7 +2428,7 @@
         .trend-flat { color: var(--ad-muted); }
 
         .dash-grid-2 { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: 1rem; }
-        .dash-grid-3 { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
+        .dash-grid-3 { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.95fr) minmax(0, 1.25fr); gap: 1rem; }
 
         /* Gráfico de ventas */
         .chart-legend { display: flex; flex-wrap: wrap; gap: 0.9rem; font-size: 0.74rem; color: var(--ad-muted); margin-bottom: 0.4rem; }
@@ -2443,7 +2454,7 @@
         /* Donut */
         .seg { display: inline-flex; padding: 3px; border-radius: 10px; background: var(--ad-card-2); border: 1px solid var(--ad-line); }
         .seg button { border: 0; background: transparent; color: var(--ad-muted); font-size: 0.74rem; font-weight: 700; padding: 0.28rem 0.7rem; border-radius: 7px; cursor: pointer; }
-        .seg button[aria-pressed="true"] { background: var(--ad-brand); color: #fff; }
+        .seg button[aria-pressed="true"] { background: var(--ad-btn); color: #fff; }
         .donut-wrap { display: flex; align-items: center; gap: 1.1rem; flex-wrap: wrap; justify-content: center; }
         .donut { width: 168px; height: 168px; flex-shrink: 0; }
         .donut text { font-family: inherit; }
@@ -2460,12 +2471,13 @@
         .ad-table td { padding: 0.62rem 0.55rem; border-bottom: 1px solid var(--ad-line); white-space: nowrap; }
         .ad-table tr:last-child td { border-bottom: 0; }
         .ad-table .num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
-        .ad-table td.id { font-weight: 700; color: var(--ad-brand); }
+        .ad-table td.id { font-weight: 700; color: var(--ad-link); }
         .pill { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.18rem 0.55rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700; }
         .pill-cash { background: rgba(34, 197, 94, 0.15); color: var(--ad-up); }
         .pill-digital { background: rgba(139, 92, 246, 0.16); color: #a78bfa; }
         .pill-neutral { background: var(--ad-card-2); color: var(--ad-muted); }
         [data-theme="light"] .pill-digital { color: #6d28d9; }
+        [data-theme="light"] .pill-cash { color: #166534; }
         .tbl-empty { padding: 1.6rem 0.5rem; text-align: center; color: var(--ad-muted); font-size: 0.82rem; }
 
         /* Top productos */
@@ -2480,10 +2492,6 @@
         .top-units b { color: var(--ad-text); font-size: 0.82rem; }
 
         /* Resumen financiero */
-        .fin-table td:first-child { color: var(--ad-muted); }
-        .fin-table .total td { font-weight: 800; border-top: 1px solid var(--ad-line); }
-        .fin-pos { color: var(--ad-up); }
-        .fin-neg { color: var(--ad-down); }
 
         /* --- Adaptación a pantallas más pequeñas --- */
         @media (max-width: 1180px) {
@@ -2493,10 +2501,10 @@
         @media (max-width: 900px) {
             .admin-sidebar {
                 position: absolute; top: 0; bottom: 0; left: 0; width: 264px;
-                transform: translateX(-100%); transition: transform 0.22s ease;
-                box-shadow: 12px 0 40px rgba(0, 0, 0, 0.5);
+                transform: translateX(-100%); transition: transform 0.22s ease, box-shadow 0.22s ease;
+                box-shadow: none; visibility: hidden;
             }
-            .admin-panel.ad-open .admin-sidebar { transform: translateX(0); }
+            .admin-panel.ad-open .admin-sidebar { transform: translateX(0); box-shadow: 12px 0 40px rgba(0, 0, 0, 0.5); visibility: visible; }
             .admin-panel.ad-open .ad-scrim { display: block; position: absolute; inset: 0; z-index: 4; background: rgba(2, 6, 14, 0.6); }
             .ad-menu-btn { display: grid; flex-shrink: 0; }
             .ad-search { display: none; }
@@ -2525,6 +2533,124 @@
             .admin-item { grid-template-columns: 48px minmax(0, 1fr); grid-auto-rows: auto; }
             .admin-item-price { grid-column: 2; }
             .admin-item-actions { grid-column: 2; }
+        }
+
+        /* ---------- Controles de formulario (todas las pestañas) ---------- */
+        .admin-panel { scrollbar-color: var(--ad-line-strong) transparent; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; touch-action: manipulation; }
+        .admin-panel :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]), select, textarea) {
+            font-family: inherit; font-size: 0.9rem; line-height: 1.3;
+            padding: 0.62rem 0.8rem; border-radius: 10px;
+            background: var(--ad-card-2) !important; color: var(--ad-text) !important;
+            border: 1px solid var(--ad-line-strong) !important;
+        }
+        .admin-panel ::placeholder { color: var(--ad-muted); opacity: 1; }
+        .admin-panel select { cursor: pointer; }
+        .admin-panel option { background: var(--ad-card); color: var(--ad-text); }
+        .admin-panel .ad-search input { padding-left: 2.3rem; }
+        .admin-panel label { color: var(--ad-text); }
+        .admin-panel code { padding: 0.05rem 0.35rem; border-radius: 6px; background: var(--ad-card-2); border: 1px solid var(--ad-line); font-size: 0.85em; color: var(--ad-text); }
+        .admin-panel .btn-admin { min-height: 40px; justify-content: center; }
+        .admin-panel .btn-admin-primary { background: var(--ad-btn); color: #fff; box-shadow: 0 8px 18px -10px rgba(37, 99, 235, 0.9); }
+        .admin-panel .btn-admin-primary:hover { background: var(--ad-btn-hover); filter: none; transform: translateY(-1px); }
+        .admin-panel .btn-admin-ghost { background: var(--ad-card-2); color: var(--ad-text); border: 1px solid var(--ad-line-strong); }
+        .admin-panel .btn-admin-ghost:hover { border-color: var(--ad-link); color: var(--ad-link); }
+        .admin-panel .btn-admin:focus-visible, .admin-panel .icon-btn:focus-visible, .admin-panel .seg button:focus-visible { outline: 2px solid var(--ad-link); outline-offset: 2px; }
+        .admin-panel .icon-btn { background: var(--ad-card-2); color: var(--ad-text); border: 1px solid var(--ad-line-strong); }
+        .admin-panel .icon-btn:hover { color: var(--ad-link); border-color: var(--ad-link); }
+        .admin-panel .icon-btn.danger:hover { color: var(--ad-down); border-color: var(--ad-down); }
+        [data-theme="light"] .admin-item-status.active { color: #166534; border-color: rgba(22, 101, 52, 0.45); background: rgba(22, 163, 74, 0.1); }
+        [data-theme="light"] .admin-item-status.retired { color: #92400e; border-color: rgba(180, 83, 9, 0.45); background: rgba(245, 158, 11, 0.12); }
+        [data-theme="light"] .admin-item-status.sold-out { color: #b91c1c; border-color: rgba(185, 28, 28, 0.45); background: rgba(239, 68, 68, 0.08); }
+        .admin-item-meta, .admin-item-price .admin-price-usd { color: var(--ad-muted); }
+
+        /* ---------- Pestañas Gastos / POS / Ajustes ---------- */
+        .page-intro { font-size: 0.82rem; color: var(--ad-muted); margin-bottom: 1rem; }
+        .two-col { display: grid; grid-template-columns: minmax(280px, 400px) minmax(0, 1fr); gap: 1rem; align-items: start; }
+        .f-stack { display: flex; flex-direction: column; gap: 0.9rem; }
+        .f { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
+        .f label { font-size: 0.78rem; font-weight: 700; }
+        .f input, .f select { width: 100%; min-width: 0; }
+        .f-msg { min-height: 1.1rem; font-size: 0.82rem; color: var(--ad-down); }
+        .f-msg:empty { min-height: 0; }
+        .note { margin-top: 1rem; padding: 0.75rem 0.9rem; border-radius: 12px; background: var(--ad-card-2); border: 1px solid var(--ad-line); font-size: 0.76rem; line-height: 1.5; color: var(--ad-muted); }
+        .note strong { color: var(--ad-text); }
+        .settings-wrap { max-width: 540px; }
+        .rate-now { display: flex; flex-direction: column; gap: 0.15rem; padding: 0.8rem 0.95rem; margin-bottom: 1rem; border-radius: 12px; background: var(--ad-card-2); border: 1px solid var(--ad-line); }
+        .rate-now span { font-size: 0.75rem; color: var(--ad-muted); }
+        .rate-now b { font-size: 1.25rem; }
+        .exp-list { display: flex; flex-direction: column; }
+        .exp-row { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; padding: 0.7rem 0; border-bottom: 1px solid var(--ad-line); }
+        .exp-row:last-child { border-bottom: 0; }
+        .exp-main { min-width: 0; }
+        .exp-main strong { display: block; font-size: 0.86rem; overflow-wrap: anywhere; }
+        .exp-main small { font-size: 0.74rem; color: var(--ad-muted); }
+        .exp-side { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
+        .exp-amount { font-weight: 800; font-size: 0.86rem; white-space: nowrap; }
+        .btn-danger-sm { padding: 0.35rem 0.65rem; border-radius: 8px; border: 1px solid var(--ad-down); background: transparent; color: var(--ad-down); font-size: 0.75rem; font-weight: 700; cursor: pointer; }
+        .btn-danger-sm:hover { background: var(--ad-down); color: #fff; }
+        .empty-note { padding: 1.4rem 0.5rem; text-align: center; color: var(--ad-muted); font-size: 0.84rem; }
+
+        .pos-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
+        .pos-side { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
+        .pos-search { display: flex; gap: 0.5rem; margin-bottom: 0.7rem; }
+        .ad-search.block { max-width: none; margin: 0; }
+        .pos-list { max-height: 340px; overflow-y: auto; border: 1px solid var(--ad-line); border-radius: 12px; background: var(--ad-card-2); padding: 0 0.7rem; }
+        .pos-cart { max-height: 260px; min-height: 90px; }
+        .pos-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0; border-bottom: 1px solid var(--ad-line); font-size: 0.82rem; }
+        .pos-row:last-child { border-bottom: 0; }
+        .pos-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .pos-name small { color: var(--ad-muted); font-size: 0.72rem; }
+        .pos-price { font-weight: 700; white-space: nowrap; }
+        .pos-qty { display: inline-flex; align-items: center; gap: 0.2rem; }
+        .pos-qty button, .pos-x { width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--ad-line-strong); background: var(--ad-card); color: var(--ad-text); font-size: 0.9rem; cursor: pointer; line-height: 1; }
+        .pos-qty button:hover { border-color: var(--ad-link); color: var(--ad-link); }
+        .pos-qty span { min-width: 1.4rem; text-align: center; font-weight: 700; }
+        .pos-x { color: var(--ad-down); border-color: transparent; background: transparent; font-size: 1.1rem; }
+        .pos-x:hover { background: rgba(239, 68, 68, 0.14); }
+        .pos-empty { padding: 0.9rem 0; font-size: 0.82rem; color: var(--ad-muted); }
+        .pos-totals { font-size: 0.86rem; line-height: 1.7; margin-bottom: 0.9rem; }
+        .pos-totals .row { display: flex; justify-content: space-between; gap: 1rem; }
+        .pos-totals .row span { color: var(--ad-muted); }
+        .pos-totals .row.big { font-size: 1.05rem; padding-top: 0.4rem; margin-top: 0.3rem; border-top: 1px solid var(--ad-line); }
+        .pos-totals .row.big span { color: var(--ad-text); font-weight: 700; }
+        .pos-totals small { color: var(--ad-muted); font-size: 0.72rem; }
+        .pos-method { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.9rem; }
+        .pos-method > span { font-size: 0.78rem; font-weight: 700; }
+        .pos-method .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        .pos-charge { width: 100%; font-size: 1rem; }
+        .pos-result { margin-top: 0.7rem; font-size: 0.85rem; line-height: 1.4; min-height: 1.2rem; }
+        .pos-result code { word-break: break-all; }
+
+        /* ---------- Finanzas (filas, sin tabla: no se sale de la tarjeta) ---------- */
+        .fin { display: flex; flex-direction: column; }
+        .fin-row { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr); gap: 0.6rem; align-items: baseline; padding: 0.62rem 0; border-bottom: 1px solid var(--ad-line); font-size: 0.8rem; }
+        .fin-row:last-child { border-bottom: 0; }
+        .fin-row.head { padding-top: 0; font-size: 0.7rem; font-weight: 700; color: var(--ad-muted); }
+        .fin-row.total { font-weight: 800; border-top: 1px solid var(--ad-line-strong); }
+        .fin-label { color: var(--ad-muted); }
+        .fin-row.total .fin-label { color: var(--ad-text); }
+        .fin-val { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+        .fin-val::before { display: none; }
+        .fin-pos { color: var(--ad-up); }
+        .fin-neg { color: var(--ad-down); }
+
+        @media (max-width: 1180px) {
+            .two-col, .pos-grid { grid-template-columns: minmax(0, 1fr); }
+            .settings-wrap { max-width: none; }
+        }
+        @media (max-width: 900px) {
+            /* 16 px evita el zoom automático de iOS al enfocar un campo. */
+            .admin-panel :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea) { font-size: 16px; }
+            .admin-overlay { height: 100vh; height: 100dvh; }
+            .ad-search.block { display: block; flex: 1; min-width: 0; }
+        }
+        @media (max-width: 640px) {
+            .fin-row { grid-template-columns: 1fr 1fr; row-gap: 0.15rem; }
+            .fin-row.head { display: none; }
+            .fin-row .fin-label { grid-column: 1 / -1; font-size: 0.74rem; }
+            .fin-val { text-align: left; font-size: 0.86rem; }
+            .fin-val::before { display: block; content: attr(data-cap); font-size: 0.66rem; font-weight: 600; color: var(--ad-muted); }
+            .pos-search .btn-admin { padding-inline: 0.8rem; }
         }
         @media (prefers-reduced-motion: reduce) {
             .admin-sidebar, .tab-panel.active { transition: none; animation: none; }
@@ -3212,75 +3338,73 @@
 
                 <!-- POS -->
                 <div id="tab-pos" class="tab-panel" role="tabpanel">
-                    <div style="padding:0.5rem 0;">
-                        <h2 style="font-size:1.05rem; font-weight:800; margin-bottom:0.35rem;">Punto de Venta (POS)</h2>
-                        <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.6rem;">Buscá el producto, agregalo al carrito y cobrá con <code>register_sale</code>.</p>
-
-                        <!-- Buscador -->
-                        <div style="display:flex; gap:0.35rem; margin-bottom:0.6rem; align-items:center;">
-                            <input id="posSearch" type="text" placeholder="Nombre o ID del producto..." style="flex:1; padding:0.45rem 0.7rem; border-radius:0.5rem; border:1px solid var(--surface-3); background:var(--surface); color:var(--text); font-size:0.88rem;" oninput="renderPosSearch()" aria-label="Buscar producto para POS" />
-                            <button onclick="clearPosSearch()" class="btn-admin btn-admin-ghost" style="padding:0.45rem 0.7rem; font-size:0.82rem;" aria-label="Limpiar búsqueda">Limpiar</button>
-                        </div>
-
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
-                            <!-- Columna izquierda: resultados y carrito -->
-                            <div>
-                                <h3 style="font-size:0.85rem; font-weight:700; margin:0.2rem 0 0.35rem;">Resultados</h3>
-                                <div id="posResults" style="max-height:220px; overflow-y:auto; border:1px solid var(--surface-3); border-radius:0.6rem; padding:0.35rem; background:var(--surface);"></div>
-
-                                <h3 style="font-size:0.85rem; font-weight:700; margin:0.7rem 0 0.35rem;">Carrito</h3>
-                                <div id="posCart" style="border:1px solid var(--surface-3); border-radius:0.6rem; padding:0.35rem; background:var(--surface); min-height:80px;"></div>
+                    <p class="page-intro">Busca el producto, agrégalo al carrito y cobra con <code>register_sale</code>.</p>
+                    <div class="pos-grid">
+                        <section class="dash-card" aria-labelledby="posProdTitle">
+                            <div class="dash-card-head"><h4 id="posProdTitle">Productos</h4></div>
+                            <div class="pos-search">
+                                <label class="ad-search block">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    <input id="posSearch" type="search" placeholder="Nombre o ID del producto…" oninput="renderPosSearch()" aria-label="Buscar producto para POS" autocomplete="off">
+                                </label>
+                                <button type="button" onclick="clearPosSearch()" class="btn-admin btn-admin-ghost" aria-label="Limpiar búsqueda">Limpiar</button>
                             </div>
-
-                            <!-- Columna derecha: totales y cobro -->
-                            <div>
-                                <div style="background:var(--surface); border:1px solid var(--surface-3); border-radius:0.6rem; padding:0.7rem;">
-                                    <h3 style="font-size:0.85rem; font-weight:700; margin:0 0 0.5rem;">Previsualización</h3>
-                                    <div id="posTotals" style="font-size:0.9rem; line-height:1.4; color:var(--text-secondary);"></div>
-
-                                    <div style="margin:0.6rem 0 0.2rem;">
-                                        <label style="font-weight:600; font-size:0.82rem;">Método de pago</label>
-                                        <div style="display:flex; gap:0.35rem; margin-top:0.25rem;">
-                                            <button id="posMethodCash" onclick="setPosMethod('EFECTIVO')" class="btn-admin btn-admin-primary" style="flex:1; padding:0.3rem; font-size:0.82rem;" aria-pressed="true">Efectivo</button>
-                                            <button id="posMethodDigital" onclick="setPosMethod('DIGITAL')" class="btn-admin btn-admin-ghost" style="flex:1; padding:0.3rem; font-size:0.82rem;" aria-pressed="false">Digital</button>
-                                        </div>
+                            <div id="posResults" class="pos-list"></div>
+                        </section>
+                        <div class="pos-side">
+                            <section class="dash-card" aria-labelledby="posCartTitle">
+                                <div class="dash-card-head"><h4 id="posCartTitle">Carrito</h4></div>
+                                <div id="posCart" class="pos-list pos-cart"></div>
+                            </section>
+                            <section class="dash-card" aria-labelledby="posPayTitle">
+                                <div class="dash-card-head"><h4 id="posPayTitle">Cobro</h4></div>
+                                <div id="posTotals" class="pos-totals"></div>
+                                <div class="pos-method">
+                                    <span>Método de pago</span>
+                                    <div class="row">
+                                        <button type="button" id="posMethodCash" onclick="setPosMethod('EFECTIVO')" class="btn-admin btn-admin-primary" aria-pressed="true">Efectivo</button>
+                                        <button type="button" id="posMethodDigital" onclick="setPosMethod('DIGITAL')" class="btn-admin btn-admin-ghost" aria-pressed="false">Digital</button>
                                     </div>
-
-                                    <button onclick="posCharge()" id="posChargeBtn" class="btn-admin btn-admin-primary" style="width:100%; margin-top:0.6rem; padding:0.55rem; font-weight:700; font-size:0.95rem;" aria-label="Cobrar venta">Cobrar</button>
-
-                                    <div id="posResult" style="margin-top:0.6rem; font-size:0.85rem; line-height:1.35; min-height:3rem;"></div>
                                 </div>
-                            </div>
+                                <button type="button" onclick="posCharge()" id="posChargeBtn" class="btn-admin btn-admin-primary pos-charge" aria-label="Cobrar venta">Cobrar</button>
+                                <div id="posResult" class="pos-result" role="status"></div>
+                            </section>
                         </div>
                     </div>
                 </div>
 
                 <!-- Gastos -->
                 <div id="tab-gastos" class="tab-panel" role="tabpanel">
-                    <h2 style="font-size:1.05rem;font-weight:800;margin:0 0 0.6rem;">Gastos Operativos</h2>
-                    <form id="expenseForm" onsubmit="submitExpense(event)" style="display:grid;gap:0.45rem;margin-bottom:0.7rem;max-width:420px;">
-                        <div>
-                            <label for="expenseConcept" style="font-size:0.8rem;font-weight:600;">Concepto</label>
-                            <input id="expenseConcept" type="text" placeholder="Ej. Alquiler local" required style="width:100%;padding:0.35rem;" />
-                        </div>
-                        <div>
-                            <label for="expenseCategory" style="font-size:0.8rem;font-weight:600;">Categoría</label>
-                            <select id="expenseCategory" style="width:100%;padding:0.35rem;">
-                                <option value="General" selected>General</option>
-                                <option value="Alquiler">Alquiler</option>
-                                <option value="Transporte">Transporte</option>
-                                <option value="Insumos">Insumos</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="expenseAmount" style="font-size:0.8rem;font-weight:600;">Importe CUP (no negativo)</label>
-                            <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0.00" required style="width:100%;padding:0.35rem;" />
-                        </div>
-                        <div id="expenseMsg" style="font-size:0.82rem;color:var(--danger);min-height:1.1rem;"></div>
-                        <button type="submit" class="btn-admin btn-admin-primary" style="padding:0.45rem;">Registrar gasto</button>
-                    </form>
-                    <div style="font-weight:700;margin-bottom:0.35rem;">Listado del mes · Total: <span id="expenseMonthTotal" style="color:var(--accent);">0.00</span> CUP</div>
-                    <div id="expenseList" style="font-size:0.85rem;line-height:1.35;"></div>
+                    <div class="two-col">
+                        <section class="dash-card" aria-labelledby="expNewTitle">
+                            <div class="dash-card-head"><h4 id="expNewTitle">Nuevo gasto<small>Gastos operativos del negocio</small></h4></div>
+                            <form id="expenseForm" onsubmit="submitExpense(event)" class="f-stack">
+                                <div class="f">
+                                    <label for="expenseConcept">Concepto</label>
+                                    <input id="expenseConcept" type="text" placeholder="Ej. Alquiler local" required autocomplete="off">
+                                </div>
+                                <div class="f">
+                                    <label for="expenseCategory">Categoría</label>
+                                    <select id="expenseCategory">
+                                        <option value="General" selected>General</option>
+                                        <option value="Alquiler">Alquiler</option>
+                                        <option value="Transporte">Transporte</option>
+                                        <option value="Insumos">Insumos</option>
+                                    </select>
+                                </div>
+                                <div class="f">
+                                    <label for="expenseAmount">Importe en CUP (no negativo)</label>
+                                    <input id="expenseAmount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00" required>
+                                </div>
+                                <div id="expenseMsg" class="f-msg" role="alert"></div>
+                                <button type="submit" class="btn-admin btn-admin-primary">Registrar gasto</button>
+                            </form>
+                        </section>
+                        <section class="dash-card" aria-labelledby="expListTitle">
+                            <div class="dash-card-head"><h4 id="expListTitle">Gastos del mes<small>Total: <b id="expenseMonthTotal">0 CUP</b></small></h4></div>
+                            <div id="expenseList" class="exp-list"></div>
+                        </section>
+                    </div>
                 </div>
 
                 <!-- Dashboard -->
@@ -3392,10 +3516,7 @@
 
                             <section class="dash-card" aria-labelledby="finTitle">
                                 <div class="dash-card-head"><h4 id="finTitle">Finanzas</h4></div>
-                                <table class="ad-table fin-table">
-                                    <thead><tr><th></th><th class="num" style="text-align:right;">Hoy</th><th class="num" style="text-align:right;">Mes</th></tr></thead>
-                                    <tbody id="finBody"></tbody>
-                                </table>
+                                <div class="fin" id="finBody" role="table" aria-label="Finanzas de hoy y del mes"></div>
                             </section>
                         </div>
                     </div>
@@ -3403,20 +3524,20 @@
 
                 <!-- Ajustes -->
                 <div id="tab-ajustes" class="tab-panel" role="tabpanel">
-                    <div style="padding:1.25rem; max-width:28rem; margin:0 auto;">
-                        <h2 style="font-size:1.05rem; font-weight:800; margin-bottom:0.25rem;">Ajustes</h2>
-                        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:1rem;">Tasa configurable sin tocar código. Al guardar, el servidor recalcula <code>price_usd</code> y <code>old_price_usd</code> de todo el catálogo.</p>
-                        <div style="margin-bottom:0.75rem; padding:0.7rem; border:1px solid var(--border); border-radius:0.5rem; background:var(--bg-secondary);">
-                            <div style="font-size:0.75rem; color:var(--text-secondary);">Tasa vigente (CUP / USD)</div>
-                            <div id="adjustRateCurrent" style="font-weight:700; font-size:1.1rem;">—</div>
-                        </div>
-                        <label for="adjustRateInput" style="font-size:0.78rem; font-weight:600; display:block; margin-bottom:0.25rem;">Nueva tasa (mayor que 0, máx. 2 decimales)</label>
-                        <input id="adjustRateInput" type="number" step="0.01" min="0.01" style="width:100%; padding:0.55rem 0.6rem; border:1px solid var(--border); border-radius:0.4rem; background:var(--bg-card); color:var(--text-primary); font-size:0.95rem; margin-bottom:0.35rem;" placeholder="Ej. 820" />
-                        <button onclick="saveAdjustmentRate()" style="padding:0.6rem 1rem; border:none; border-radius:0.4rem; background:var(--accent); color:#fff; font-weight:700; cursor:pointer;">Guardar tasa</button>
-                        <div id="adjustMsg" style="margin-top:0.6rem; font-size:0.82rem; min-height:1.3rem;"></div>
-                        <div style="margin-top:0.75rem; padding:0.6rem; border:1px solid rgba(255,255,255,0.08); border-radius:0.4rem; background:rgba(255,255,255,0.03); font-size:0.75rem; color:var(--text-secondary);">
-                            <strong style="color:var(--text-primary);">Nota:</strong> el trigger <code>settings_rate_trg</code> en la base de datos recalcula <code>price_usd</code> y <code>old_price_usd</code> de todos los productos al actualizar la tasa. No se escribe directamente en <code>products</code> desde el cliente.
-                        </div>
+                    <div class="settings-wrap">
+                        <section class="dash-card" aria-labelledby="rateTitle">
+                            <div class="dash-card-head"><h4 id="rateTitle">Tasa de cambio<small>Sin tocar código; se recalcula todo el catálogo al guardar</small></h4></div>
+                            <div class="rate-now"><span>Tasa vigente (CUP / USD)</span><b id="adjustRateCurrent">—</b></div>
+                            <div class="f-stack">
+                                <div class="f">
+                                    <label for="adjustRateInput">Nueva tasa (mayor que 0, máx. 2 decimales)</label>
+                                    <input id="adjustRateInput" type="number" step="0.01" min="0.01" inputmode="decimal" placeholder="Ej. 820">
+                                </div>
+                                <button type="button" class="btn-admin btn-admin-primary" onclick="saveAdjustmentRate()">Guardar tasa</button>
+                                <div id="adjustMsg" class="f-msg" role="status"></div>
+                            </div>
+                            <p class="note"><strong>Nota:</strong> el trigger <code>settings_rate_trg</code> en la base de datos recalcula <code>price_usd</code> y <code>old_price_usd</code> de todos los productos al actualizar la tasa. No se escribe directamente en <code>products</code> desde el cliente.</p>
+                        </section>
                     </div>
                 </div>
 
@@ -4640,7 +4761,17 @@
             return true;
         }
 
+        /* Mientras el panel está abierto, el viewport se fija: sin zoom por
+           pellizco ni por doble toque, para que no se desborde en móviles. */
+        const VIEWPORT_META = document.querySelector('meta[name="viewport"]');
+        const VIEWPORT_NORMAL = VIEWPORT_META ? VIEWPORT_META.getAttribute('content') : '';
+        function lockAdminViewport(lock) {
+            if (!VIEWPORT_META) return;
+            VIEWPORT_META.setAttribute('content', lock ? 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover' : VIEWPORT_NORMAL);
+        }
+
         function openAdminPanel() {
+            lockAdminViewport(true);
             document.getElementById('adminOverlay').classList.add('active');
             document.body.style.overflow = 'hidden';
             if (adminUnlocked) {
@@ -4656,6 +4787,7 @@
         }
 
         function closeAdminPanel() {
+            lockAdminViewport(false);
             document.getElementById('adminOverlay').classList.remove('active');
             document.body.style.overflow = '';
         }
@@ -5016,13 +5148,13 @@
             const msg = document.getElementById('adjustMsg');
             const input = document.getElementById('adjustRateInput');
             const core = window.VentasCelCore || {};
-            if (msg) msg.style.color = 'var(--text-secondary)';
+            if (msg) msg.style.color = 'var(--ad-muted)';
             if (!input) { if (msg) msg.textContent = 'Campo no encontrado.'; return; }
             const raw = input.value;
             const val = Number(raw);
             const v = (core.validateExchangeRate && typeof core.validateExchangeRate === 'function') ? core.validateExchangeRate(raw) : { ok: true, value: val };
             if (!v.ok) {
-                if (msg) { msg.textContent = v.message || 'Tasa inválida.'; msg.style.color = '#dc2626'; }
+                if (msg) { msg.textContent = v.message || 'Tasa inválida.'; msg.style.color = 'var(--ad-down)'; }
                 return;
             }
             try {
@@ -5036,16 +5168,16 @@
                 }));
                 const { error } = await client.from('settings').update({ exchange_rate: v.value, updated_at: new Date().toISOString() }).eq('id', 1);
                 if (error) {
-                    if (msg) { msg.textContent = 'Error al guardar: ' + (error.message || error); msg.style.color = '#dc2626'; }
+                    if (msg) { msg.textContent = 'Error al guardar: ' + (error.message || error); msg.style.color = 'var(--ad-down)'; }
                     return;
                 }
                 // Confirmación de recálculo por trigger BD
-                if (msg) { msg.textContent = 'Tasa guardada: ' + v.value.toFixed(2) + ' CUP/USD. El trigger settings_rate_trg recalcula price_usd/old_price_usd de todo el catálogo en la base de datos.'; msg.style.color = '#22c55e'; }
+                if (msg) { msg.textContent = 'Tasa guardada: ' + v.value.toFixed(2) + ' CUP/USD. El trigger settings_rate_trg recalcula price_usd/old_price_usd de todo el catálogo en la base de datos.'; msg.style.color = 'var(--ad-up)'; }
                 window.posRate = v.value;
                 await loadAdjustmentRate();
                 try { await loadDashboard(); } catch (e) { /* ignorar */ }
             } catch (e) {
-                if (msg) { msg.textContent = 'No se guardó: ' + (e.message || e); msg.style.color = '#dc2626'; }
+                if (msg) { msg.textContent = 'No se guardó: ' + (e.message || e); msg.style.color = 'var(--ad-down)'; }
             }
         }
 
@@ -6057,55 +6189,51 @@
         }
 
         function renderPosSearch() {
-            const query = document.getElementById('posSearch').value.trim().toLowerCase();
+            const input = document.getElementById('posSearch');
             const results = document.getElementById('posResults');
-            if (!results) return;
-            const catalog = (window.VentasCelCore && typeof window.VentasCelCore.filterAndSort === 'function') ? products : [];
-            let list = products.slice();
-            if (typeof window.VentasCelCore !== 'undefined' && window.VentasCelCore.filterAndSort) {
-                list = window.VentasCelCore.filterAndSort(products, { query: document.getElementById('posSearch').value.trim() || '' });
-            }
+            if (!results || !input) return;
+            const q = input.value.trim().toLowerCase();
+            const list = Array.isArray(products) ? products : [];
             const matches = list.filter(p => {
-                if (!p || typeof p !== 'object') return false;
-                const q = (document.getElementById('posSearch') ? document.getElementById('posSearch').value.trim() : '').toLowerCase();
+                if (!p || typeof p !== 'object' || p.active === false) return false;
                 if (!q) return true;
-                return (p.name || '').toLowerCase().includes(q) || String(p.id || '').includes(q);
+                return String(p.name || '').toLowerCase().includes(q) || String(p.id || '').includes(q);
             });
             if (matches.length === 0) {
-                results.innerHTML = '<div style="font-size:0.82rem; color:var(--text-secondary); padding:0.2rem 0;">Sin resultados.</div>';
+                results.innerHTML = '<div class="pos-empty">Sin resultados.</div>';
                 return;
             }
-            results.innerHTML = matches.map(p => {
-                const core = window.VentasCelCore;
+            const core = window.VentasCelCore;
+            results.innerHTML = matches.slice(0, 60).map(p => {
                 const priceText = core ? core.formatCup(p.price) : String(p.price || 0);
-                return `<div style="display:flex; align-items:center; gap:0.35rem; padding:0.25rem 0; border-bottom:1px solid var(--surface-3); font-size:0.82rem;">
-                    <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.name} <span style="color:var(--text-secondary); font-size:0.75rem;">(ID ${p.id})</span></div>
-                    <div style="font-weight:600; white-space:nowrap;">${priceText}</div>
-                    <button onclick="addPosItem({id:${p.id}, name:'${String(p.name || '').replace(/'/g,'\\\'')}', price:${p.price||0}, cost_price:${(p.cost_price !== undefined && p.cost_price !== null) ? p.cost_price : 0}})" class="btn-admin btn-admin-ghost" style="padding:0.2rem 0.35rem; font-size:0.75rem;" aria-label="Agregar ${String(p.name || '').replace(/'/g,'\\\'')}">+ Agregar</button>
-                </div>`;
+                const soldOut = core && core.isSoldOut(p);
+                return '<div class="pos-row"><div class="pos-name" title="' + dashEsc(p.name) + '">' + dashEsc(p.name) + ' <small>(ID ' + dashEsc(p.id) + ')</small></div>'
+                    + '<div class="pos-price">' + priceText + '</div>'
+                    + '<button type="button" onclick="addPosItemById(' + Number(p.id) + ')" class="btn-admin btn-admin-ghost" style="min-height:34px;padding:0.3rem 0.6rem;font-size:0.76rem;"' + (soldOut ? ' disabled title="Agotado"' : '') + ' aria-label="Agregar ' + dashEsc(p.name) + '">' + (soldOut ? 'Agotado' : '+ Agregar') + '</button></div>';
             }).join('');
+        }
+
+        function addPosItemById(id) {
+            const product = (Array.isArray(products) ? products : []).find(p => Number(p.id) === Number(id));
+            if (!product) return;
+            addPosItem({ id: product.id, name: product.name, price: product.price || 0, cost_price: (product.cost_price !== undefined && product.cost_price !== null) ? product.cost_price : 0 });
         }
 
         function renderPosCart() {
             const cartEl = document.getElementById('posCart');
             if (!cartEl) return;
             if (posCart.length === 0) {
-                cartEl.innerHTML = '<div style="font-size:0.82rem; color:var(--text-secondary);">Carrito vacío.</div>';
+                cartEl.innerHTML = '<div class="pos-empty">Carrito vacío.</div>';
                 return;
             }
+            const core = window.VentasCelCore;
             cartEl.innerHTML = posCart.map(i => {
-                const core = window.VentasCelCore;
-                const priceText = core ? core.formatCup(i.unit_price) : String(i.unit_price || 0);
-                return `<div style="display:flex; align-items:center; gap:0.35rem; padding:0.25rem 0; border-bottom:1px solid var(--surface-3); font-size:0.82rem;">
-                    <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${i.name}</div>
-                    <div style="display:flex; align-items:center; gap:0.15rem;">
-                        <button onclick="updatePosQty(${i.id}, -1)" aria-label="Reducir cantidad de ${String(i.name).replace(/'/g,'\\\'')}" style="padding:0.1rem 0.3rem; font-size:0.75rem;">-</button>
-                        <span style="min-width:1.2rem; text-align:center;">${i.qty}</span>
-                        <button onclick="updatePosQty(${i.id}, 1)" aria-label="Aumentar cantidad de ${String(i.name).replace(/'/g,'\\\'')}" style="padding:0.1rem 0.3rem; font-size:0.75rem;">+</button>
-                    </div>
-                    <div style="font-weight:600; white-space:nowrap;">${priceText}</div>
-                    <button onclick="removePosItem(${i.id})" aria-label="Quitar ${String(i.name).replace(/'/g,'\\\'')}" style="padding:0.1rem 0.4rem; font-size:0.75rem; color:var(--danger);">×</button>
-                </div>`;
+                const priceText = core ? core.formatCup(i.unit_price * i.qty) : String(i.unit_price * i.qty);
+                const name = dashEsc(i.name);
+                return '<div class="pos-row"><div class="pos-name" title="' + name + '">' + name + '</div>'
+                    + '<div class="pos-qty"><button type="button" onclick="updatePosQty(' + Number(i.id) + ', -1)" aria-label="Reducir cantidad de ' + name + '">−</button><span>' + i.qty + '</span><button type="button" onclick="updatePosQty(' + Number(i.id) + ', 1)" aria-label="Aumentar cantidad de ' + name + '">+</button></div>'
+                    + '<div class="pos-price">' + priceText + '</div>'
+                    + '<button type="button" class="pos-x" onclick="removePosItem(' + Number(i.id) + ')" aria-label="Quitar ' + name + '">×</button></div>';
             }).join('');
         }
 
@@ -6145,15 +6273,16 @@
             const previewRate = (posRate !== null && Number.isFinite(posRate) && posRate > 0) ? posRate : (core ? (core.DEFAULT_RATE || 820) : 820);
             const totals = (core && typeof core.saleTotals === 'function') ? core.saleTotals(items, previewRate) : { totalCup: 0, totalUsd: 0, totalProfit: 0 };
             if (items.length === 0) {
-                totalsEl.innerHTML = '<span style="font-size:0.82rem;">Sin items.</span>';
+                totalsEl.innerHTML = '<span class="pos-empty" style="padding:0;">Sin artículos en el carrito.</span>';
             } else {
-                totalsEl.innerHTML = `
-                    <div>Items: <strong>${items.reduce((s, i) => s + i.qty, 0)}</strong></div>
-                    <div>Total CUP: <strong>${totals.totalCup !== null ? (core ? core.formatCup(totals.totalCup) : String(totals.totalCup)) : '-'}</strong></div>
-                    <div>Total USD: <strong>${totals.totalUsd !== null ? (core ? core.formatUsd(totals.totalUsd) : String(totals.totalUsd)) : '-'}</strong></div>
-                    <div>Ganancia (CUP): <strong>${totals.totalProfit !== null ? (core ? core.formatCup(totals.totalProfit) : String(totals.totalProfit)) : '-'}</strong></div>
-                    <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.2rem;">Tasa: ${core ? core.formatRate(previewRate) : previewRate + ' CUP = 1 USD'}</div>
-                `;
+                const fmtCup = v => (v !== null ? (core ? core.formatCup(v) : String(v)) : '-');
+                const fmtUsd = v => (v !== null ? (core ? core.formatUsd(v) : String(v)) : '-');
+                totalsEl.innerHTML =
+                    '<div class="row"><span>Artículos</span><strong>' + items.reduce((s, i) => s + i.qty, 0) + '</strong></div>' +
+                    '<div class="row"><span>Total USD</span><strong>' + fmtUsd(totals.totalUsd) + '</strong></div>' +
+                    '<div class="row"><span>Ganancia</span><strong>' + fmtCup(totals.totalProfit) + '</strong></div>' +
+                    '<div class="row big"><span>Total</span><strong>' + fmtCup(totals.totalCup) + '</strong></div>' +
+                    '<small>Tasa: ' + (core ? core.formatRate(previewRate) : previewRate + ' CUP = 1 USD') + '</small>';
             }
         }
 
@@ -6162,11 +6291,11 @@
             if (!resultEl) return;
             resultEl.innerHTML = '';
             if (posCart.length === 0) {
-                resultEl.innerHTML = '<span style="color:var(--warning);">El carrito está vacío. No se puede cobrar.</span>';
+                resultEl.innerHTML = '<span style="color:var(--ad-down);font-weight:600;">El carrito está vacío. No se puede cobrar.</span>';
                 return;
             }
             if (!posMethod || (posMethod !== 'EFECTIVO' && posMethod !== 'DIGITAL')) {
-                resultEl.innerHTML = '<span style="color:var(--warning);">Seleccioná un método de pago válido.</span>';
+                resultEl.innerHTML = '<span style="color:var(--ad-down);font-weight:600;">Selecciona un método de pago válido.</span>';
                 return;
             }
             const core = window.VentasCelCore;
@@ -6188,19 +6317,19 @@
                 });
                 if (error) {
                     const msg = (error && typeof error.message === 'string') ? error.message : (error ? String(error) : 'Error desconocido');
-                    resultEl.innerHTML = `<span style="color:var(--danger); font-weight:600;">No se cobró.</span><br><span style="font-size:0.82rem;">${msg}</span>`;
+                    resultEl.innerHTML = `<span style="color:var(--ad-down); font-weight:600;">No se cobró.</span><br><span style="font-size:0.82rem;">${msg}</span>`;
                     // Carrito intacto (no se vacía)
                     return;
                 }
                 // Éxito
                 const saleId = data;
-                resultEl.innerHTML = `<span style="color:var(--accent); font-weight:700;">¡Cobrado!</span><br><span style="font-size:0.82rem;">ID de venta: <code>${saleId || 'N/A'}</code></span>`;
+                resultEl.innerHTML = `<span style="color:var(--ad-up); font-weight:700;">¡Cobrado!</span><br><span style="font-size:0.82rem;">ID de venta: <code>${saleId || 'N/A'}</code></span>`;
                 posCart = [];
                 renderPosCart();
                 renderPosTotals();
             } catch (e) {
                 const msg = (e && typeof e.message === 'string') ? e.message : (e ? String(e) : 'Error desconocido');
-                resultEl.innerHTML = `<span style="color:var(--danger); font-weight:600;">No se cobró.</span><br><span style="font-size:0.82rem;">${msg}</span>`;
+                resultEl.innerHTML = `<span style="color:var(--ad-down); font-weight:600;">No se cobró.</span><br><span style="font-size:0.82rem;">${msg}</span>`;
             }
         }
 
@@ -6213,38 +6342,32 @@
         }
         // Gastos operativos (RF-04) — sin document.localStorage ni fecha fija
         async function loadExpenses() {
+            const listEl = document.getElementById('expenseList');
             try {
                 const client = await waitForSupabaseClient();
                 const { data, error } = await client.from('expenses').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
-                const rows = Array.isArray(data) ? data : [];
-                const today = new Date();
-                const todayKey = today.toISOString().slice(0, 10);
-                const monthKey = today.toISOString().slice(0, 7);
                 const core = window.VentasCelCore || {};
-                const summary = (typeof core.expensesSummary === 'function') ? core.expensesSummary(rows, { todayKey, monthKey }) : { cupMonth: 0, cupToday: 0, countToday: 0, countMonth: 0 };
-                document.getElementById('expenseMonthTotal').textContent = (summary.cupMonth || 0).toFixed(2);
-                const listEl = document.getElementById('expenseList');
+                const now = new Date();
+                const tz = now.getTimezoneOffset();
+                const monthKey = dashTodayKey(now).slice(0, 7);
+                /* Solo los del mes en curso, con la fecha local (no UTC). */
+                const rows = (Array.isArray(data) ? data : []).filter(r => core.localDateKey && core.localDateKey(r.created_at, tz).slice(0, 7) === monthKey);
+                const total = rows.reduce((sum, r) => sum + (parseFloat(r.amount_cup) || 0), 0);
+                document.getElementById('expenseMonthTotal').textContent = core.formatCup ? core.formatCup(total) : total.toFixed(2) + ' CUP';
                 if (!rows.length) {
-                    listEl.innerHTML = '<div style="color:var(--text-secondary);">No hay gastos registrados este mes.</div>';
+                    listEl.innerHTML = '<div class="empty-note">No hay gastos registrados este mes.</div>';
                     return;
                 }
                 listEl.innerHTML = rows.map(r => {
-                    const concept = (r.concept || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                    const cat = (r.category || 'General').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                    const amount = (typeof r.amount_cup === 'number' ? r.amount_cup : (parseFloat(r.amount_cup) || 0)).toFixed(2);
-                    const date = (r.created_at || '').slice(0, 10);
-                    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:0.25rem 0;border-bottom:1px solid var(--border);">
-                        <div><strong>${concept}</strong> <span style="color:var(--text-secondary);font-size:0.78rem;">(${cat}) · ${date}</span></div>
-                        <div style="display:flex;align-items:center;gap:0.5rem;">
-                            <span style="font-weight:700;">${amount} CUP</span>
-                            <button onclick="deleteExpense(${r.id})" class="btn-admin" style="padding:0.2rem 0.45rem;font-size:0.78rem;background:var(--danger);color:#fff;border:none;border-radius:0.25rem;cursor:pointer;">Borrar</button>
-                        </div>
-                    </div>`;
+                    const amount = core.formatCup ? core.formatCup(parseFloat(r.amount_cup) || 0) : (parseFloat(r.amount_cup) || 0).toFixed(2) + ' CUP';
+                    const when = core.localDateKey ? core.localDateKey(r.created_at, tz) : '';
+                    return '<div class="exp-row"><div class="exp-main"><strong>' + (dashEsc(r.concept) || 'Sin concepto') + '</strong><small>' + dashEsc(r.category || 'General') + ' · ' + when + '</small></div>'
+                        + '<div class="exp-side"><span class="exp-amount">' + amount + '</span><button type="button" onclick="deleteExpense(' + Number(r.id) + ')" class="btn-danger-sm" aria-label="Borrar gasto ' + dashEsc(r.concept) + '">Borrar</button></div></div>';
                 }).join('');
             } catch (e) {
                 const msg = (e && typeof e.message === 'string') ? e.message : String(e);
-                document.getElementById('expenseList').innerHTML = `<div style="color:var(--danger);">Error cargando gastos: ${msg.replace(/</g,'&lt;')}</div>`;
+                listEl.innerHTML = '<div class="empty-note" style="color:var(--ad-down);">Error cargando gastos: ' + dashEsc(msg) + '</div>';
             }
         }
 
@@ -6562,12 +6685,14 @@
             if (!body || !data) return;
             const t = data.today, m = data.month;
             const signed = v => '<span class="' + (v < 0 ? 'fin-neg' : 'fin-pos') + '">' + dashCup(v) + '</span>';
+            const row = (label, a, b, cls) => '<div class="fin-row ' + (cls || '') + '" role="row"><span class="fin-label" role="rowheader">' + label + '</span><span class="fin-val" role="cell" data-cap="Hoy">' + a + '</span><span class="fin-val" role="cell" data-cap="Mes">' + b + '</span></div>';
             body.innerHTML =
-                '<tr><td>Ventas</td><td class="num">' + dashCup(t.revenue) + '</td><td class="num">' + dashCup(m.revenue) + '</td></tr>' +
-                '<tr><td>Ventas (USD)</td><td class="num">' + dashUsd(t.usd) + '</td><td class="num">' + dashUsd(m.usd) + '</td></tr>' +
-                '<tr><td>Ganancia bruta</td><td class="num">' + dashCup(t.profit) + '</td><td class="num">' + dashCup(m.profit) + '</td></tr>' +
-                '<tr><td>Gastos</td><td class="num">' + dashCup(t.expenses) + '</td><td class="num">' + dashCup(m.expenses) + '</td></tr>' +
-                '<tr class="total"><td>Balance neto</td><td class="num">' + signed(t.net) + '</td><td class="num">' + signed(m.net) + '</td></tr>';
+                '<div class="fin-row head" role="row"><span></span><span class="fin-val" role="columnheader">Hoy</span><span class="fin-val" role="columnheader">Mes</span></div>' +
+                row('Ventas', dashCup(t.revenue), dashCup(m.revenue)) +
+                row('Ventas (USD)', dashUsd(t.usd), dashUsd(m.usd)) +
+                row('Ganancia bruta', dashCup(t.profit), dashCup(m.profit)) +
+                row('Gastos', dashCup(t.expenses), dashCup(m.expenses)) +
+                row('Balance neto', signed(t.net), signed(m.net), 'total');
         }
 
         /* ---------- Más vendidos (unidades del mes) ---------- */
