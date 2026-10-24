@@ -1079,6 +1079,170 @@
         return { cupToday: round2(profitToday - cupTodayExpenses), cupMonth: round2(profitMonth - cupMonthExpenses) };
     }
 
+
+    /* ------------------------------------------------------------
+        Dashboard: agregados por día y por mes (zona horaria inyectada)
+        ------------------------------------------------------------ */
+
+    /* Fecha local "AAAA-MM-DD" de un instante ISO. tzOffsetMin es el
+       valor de Date.getTimezoneOffset() (minutos UTC − local; La
+       Habana, UTC-4 → 240). Sin reloj: solo interpreta el texto que
+       recibe. Corrige que una venta de las 22:00 locales caiga en el
+       día siguiente al cortar el ISO en UTC. */
+    function localDateKey(iso, tzOffsetMin) {
+        if (typeof iso !== 'string') return '';
+        const ms = Date.parse(iso);
+        if (!Number.isFinite(ms)) return '';
+        const off = Number.isFinite(tzOffsetMin) ? tzOffsetMin : 0;
+        return new Date(ms - off * 60000).toISOString().slice(0, 10);
+    }
+
+    function shiftMonthKey(monthKey, delta) {
+        const year = Number(monthKey.slice(0, 4));
+        const month = Number(monthKey.slice(5, 7)) - 1 + delta;
+        const date = new Date(Date.UTC(year, month, 1));
+        return date.toISOString().slice(0, 7);
+    }
+
+    function shiftDayKey(dayKey, delta) {
+        const year = Number(dayKey.slice(0, 4));
+        const month = Number(dayKey.slice(5, 7)) - 1;
+        const day = Number(dayKey.slice(8, 10)) + delta;
+        return new Date(Date.UTC(year, month, day)).toISOString().slice(0, 10);
+    }
+
+    /* Variación porcentual con un decimal; null si no hay base. */
+    function percentChange(current, previous) {
+        if (!(previous > 0)) return null;
+        return Math.round(((current - previous) / previous) * 1000) / 10;
+    }
+
+    /* Todo lo que pinta el dashboard, calculado de una vez.
+       options: { todayKey, tzOffsetMin, months = 6, days = 30 }.
+       Las tendencias comparan el mes en curso con el MISMO tramo
+       (día 1 al día de hoy) del mes anterior, para no comparar un mes
+       a medias con uno completo. */
+    function dashboardData(sales, expenses, options) {
+        const config = options && typeof options === 'object' ? options : {};
+        const todayKey = typeof config.todayKey === 'string' ? config.todayKey : '';
+        const tz = Number.isFinite(config.tzOffsetMin) ? config.tzOffsetMin : 0;
+        const monthsCount = config.months > 0 ? Math.trunc(config.months) : 6;
+        const daysCount = config.days > 0 ? Math.trunc(config.days) : 30;
+        const monthKey = todayKey.slice(0, 7);
+        const prevMonthKey = monthKey ? shiftMonthKey(monthKey, -1) : '';
+        const dayOfMonth = Number(todayKey.slice(8, 10)) || 0;
+
+        const byDay = new Map();
+        const byMonth = new Map();
+        const bump = (map, key, revenue, usd, profit) => {
+            const row = map.get(key) || { revenue: 0, usd: 0, profit: 0, orders: 0 };
+            row.revenue += revenue; row.usd += usd; row.profit += profit; row.orders += 1;
+            map.set(key, row);
+        };
+
+        const payment = { cash: { cup: 0, count: 0 }, digital: { cup: 0, count: 0 }, other: { cup: 0, count: 0 } };
+        const origin = { physical: { cup: 0, count: 0 }, online: { cup: 0, count: 0 }, other: { cup: 0, count: 0 } };
+
+        (Array.isArray(sales) ? sales : []).forEach(sale => {
+            if (!sale || typeof sale !== 'object') return;
+            const key = localDateKey(sale.created_at, tz);
+            if (!key) return;
+            const cup = toNumber(sale.total_cup) || 0;
+            const usd = toNumber(sale.total_usd) || 0;
+            const profit = toNumber(sale.total_profit) || 0;
+            bump(byDay, key, cup, usd, profit);
+            bump(byMonth, key.slice(0, 7), cup, usd, profit);
+            if (key.slice(0, 7) !== monthKey) return;
+            const method = String(sale.payment_method || '').trim().toUpperCase();
+            const bucketP = method === 'EFECTIVO' ? payment.cash : method === 'DIGITAL' ? payment.digital : payment.other;
+            bucketP.cup += cup; bucketP.count += 1;
+            const where = String(sale.origin || '').trim().toUpperCase();
+            const bucketO = (where === 'FISICO' || where === 'FÍSICO') ? origin.physical : where === 'ONLINE' ? origin.online : origin.other;
+            bucketO.cup += cup; bucketO.count += 1;
+        });
+
+        const expByDay = new Map();
+        const expByMonth = new Map();
+        (Array.isArray(expenses) ? expenses : []).forEach(expense => {
+            if (!expense || typeof expense !== 'object') return;
+            const key = localDateKey(expense.created_at, tz);
+            if (!key) return;
+            const amount = toNumber(expense.amount_cup) || 0;
+            expByDay.set(key, (expByDay.get(key) || 0) + amount);
+            expByMonth.set(key.slice(0, 7), (expByMonth.get(key.slice(0, 7)) || 0) + amount);
+        });
+
+        const empty = { revenue: 0, usd: 0, profit: 0, orders: 0 };
+        const today = byDay.get(todayKey) || empty;
+        const month = byMonth.get(monthKey) || empty;
+
+        /* Mismo tramo del mes anterior (día 1 … día de hoy). */
+        const prevSpan = { revenue: 0, profit: 0, orders: 0, expenses: 0 };
+        byDay.forEach((row, key) => {
+            if (key.slice(0, 7) === prevMonthKey && Number(key.slice(8, 10)) <= dayOfMonth) {
+                prevSpan.revenue += row.revenue; prevSpan.profit += row.profit; prevSpan.orders += row.orders;
+            }
+        });
+        expByDay.forEach((amount, key) => {
+            if (key.slice(0, 7) === prevMonthKey && Number(key.slice(8, 10)) <= dayOfMonth) prevSpan.expenses += amount;
+        });
+
+        const monthExpenses = expByMonth.get(monthKey) || 0;
+        const todayExpenses = expByDay.get(todayKey) || 0;
+        const netMonth = month.profit - monthExpenses;
+        const netPrev = prevSpan.profit - prevSpan.expenses;
+
+        const monthSeries = [];
+        for (let i = monthsCount - 1; i >= 0; i--) {
+            const key = shiftMonthKey(monthKey, -i);
+            const row = byMonth.get(key) || empty;
+            monthSeries.push({ key: key, month: Number(key.slice(5, 7)) - 1, revenue: round2(row.revenue), profit: round2(row.profit), orders: row.orders });
+        }
+        const daySeries = [];
+        for (let i = daysCount - 1; i >= 0; i--) {
+            const key = shiftDayKey(todayKey, -i);
+            const row = byDay.get(key) || empty;
+            daySeries.push({ key: key, revenue: round2(row.revenue), profit: round2(row.profit), orders: row.orders });
+        }
+
+        const rounded = list => {
+            const out = {};
+            Object.keys(list).forEach(k => { out[k] = { cup: round2(list[k].cup), count: list[k].count }; });
+            return out;
+        };
+
+        return {
+            today: { revenue: round2(today.revenue), usd: round2(today.usd), profit: round2(today.profit), orders: today.orders, expenses: round2(todayExpenses), net: round2(today.profit - todayExpenses) },
+            month: { revenue: round2(month.revenue), usd: round2(month.usd), profit: round2(month.profit), orders: month.orders, expenses: round2(monthExpenses), net: round2(netMonth) },
+            trends: {
+                revenue: percentChange(month.revenue, prevSpan.revenue),
+                orders: percentChange(month.orders, prevSpan.orders),
+                net: netPrev > 0 ? percentChange(netMonth, netPrev) : null
+            },
+            series: { months: monthSeries, days: daySeries },
+            payment: rounded(payment),
+            origin: rounded(origin)
+        };
+    }
+
+    /* Productos más vendidos a partir de líneas de venta { product_id, qty }.
+       Devuelve [{ id, units }] ordenado de mayor a menor. */
+    function topProductsByUnits(lines, limit) {
+        const totals = new Map();
+        (Array.isArray(lines) ? lines : []).forEach(line => {
+            if (!line || typeof line !== 'object') return;
+            const id = toNumber(line.product_id);
+            const qty = toNumber(line.qty);
+            if (id === null || qty === null || qty <= 0) return;
+            totals.set(id, (totals.get(id) || 0) + qty);
+        });
+        const max = limit > 0 ? Math.trunc(limit) : 5;
+        return Array.from(totals.entries())
+            .map(entry => ({ id: entry[0], units: entry[1] }))
+            .sort((a, b) => (b.units - a.units) || (a.id - b.id))
+            .slice(0, max);
+    }
+
     /* ------------------------------------------------------------
        API pública
        ------------------------------------------------------------ */
@@ -1098,6 +1262,9 @@
         originBreakdown: originBreakdown,
         expensesSummary: expensesSummary,
         netBalance: netBalance,
+        localDateKey: localDateKey,
+        dashboardData: dashboardData,
+        topProductsByUnits: topProductsByUnits,
         normalizeBadge: normalizeBadge,
         shouldShowOldPrice: shouldShowOldPrice,
         isSoldOut: isSoldOut,

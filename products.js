@@ -1,7 +1,7 @@
 /* ============================================================
  *  AUTO-GENERADO desde products.json — NO EDITAR A MANO
  *  Regenerar con: npm run build
- *  Generado: 2026-10-23T13:45:00.060Z
+ *  Generado: 2026-10-24T12:51:45.912Z
  * ============================================================ */
 window.VENTASCEL_CATALOG = {
   "catalog": "VentasCel",

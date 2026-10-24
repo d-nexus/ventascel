@@ -23,14 +23,17 @@
             --bg-secondary: #0f172a;
             --bg-card: rgba(15, 23, 42, 0.75);
             --bg-glass: rgba(8, 12, 20, 0.85);
+            --bg-tertiary: #1e293b;
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
-            --accent: #2563eb;
-            --accent-hover: #1d4ed8;
-            --accent-glow: rgba(37, 99, 235, 0.35);
+            --accent: #22d3ee;
+            --accent-hover: #06b6d4;
+            --accent-glow: rgba(34, 211, 238, 0.35);
             --accent-secondary: #dc2626;
             --border-color: rgba(255, 255, 255, 0.08);
             --card-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+            --radius: 12px;
+            --sidebar-width: 240px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -47,6 +50,9 @@
             --accent-secondary: #b91c1c;
             --border-color: rgba(0, 0, 0, 0.08);
             --card-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08);
+            --bg-tertiary: #e2e8f0;
+            --radius: 12px;
+            --sidebar-width: 240px;
         }
 
         /* ==========================================
@@ -1932,58 +1938,14 @@
             max-width: 100%;
             max-height: calc(100vh - 3rem);
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             overflow: hidden;
         }
-
-        .admin-header {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            padding: 1.25rem 1.75rem;
-            border-bottom: 1px solid var(--border-color);
-            background: var(--bg-card);
+        .admin-content {
+            flex: 1; min-width: 0;
+            display: flex; flex-direction: column; overflow: hidden;
         }
 
-        .admin-header-title { display: flex; align-items: center; gap: 0.85rem; }
-        .admin-header-title i {
-            width: 42px; height: 42px;
-            border-radius: 12px;
-            display: grid; place-items: center;
-            color: #fff;
-            background: linear-gradient(135deg, var(--accent), #1e40af);
-        }
-        .admin-header-title h3 { font-size: 1.05rem; font-weight: 800; line-height: 1.2; }
-        .admin-header-title span { font-size: 0.78rem; color: var(--text-secondary); }
-
-        .admin-tabs {
-            display: flex;
-            gap: 0.35rem;
-            flex-wrap: wrap;
-            width: 100%;
-            margin-top: 0.6rem;
-        }
-        .tab-btn {
-            padding: 0.45rem 0.85rem;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            background: var(--bg-secondary);
-            color: var(--text-secondary);
-            font-size: 0.78rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            white-space: nowrap;
-        }
-        .tab-btn:hover { border-color: var(--accent); color: var(--text-primary); }
-        .tab-btn[aria-selected="true"] {
-            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-            color: #fff;
-            border-color: var(--accent);
-            box-shadow: 0 4px 12px -4px rgba(59,130,246,0.35);
-        }
         .tab-panel { display: none; animation: fadeIn 0.15s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
         .tab-panel.active { display: block; }
@@ -2211,24 +2173,364 @@
             border-top: 1px solid var(--border-color);
         }
 
-        @media (max-width: 720px) {
-            .admin-overlay { padding: 0.5rem; }
-            .admin-panel { border-radius: 16px; max-width: 100%; max-height: calc(100vh - 1rem); }
-            .admin-body { padding: 1rem; }
-            /* La cabecera se apila: el título arriba y los botones (incluido
-               el de cerrar) en su propia fila, sin salirse del viewport. */
-            .admin-header {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 0.75rem;
-                padding: 0.9rem 1rem;
+        /* ==========================================
+           PANEL DE ADMINISTRACIÓN — layout de dashboard
+           Sidebar oscuro · cabecera · contenido en rejilla · pie.
+           Los tokens --ad-* viven solo dentro del panel y siguen
+           el tema claro/oscuro de la tienda.
+           ========================================== */
+        .admin-overlay { padding: 0; }
+        .admin-login { margin: 1rem; }
+
+        .admin-panel {
+            --ad-bg: #0a0f1c;
+            --ad-card: #111a2e;
+            --ad-card-2: #17223b;
+            --ad-line: rgba(255, 255, 255, 0.08);
+            --ad-text: #f1f5f9;
+            --ad-muted: #94a3b8;
+            --ad-side: #060b17;
+            --ad-side-text: #9fb0cf;
+            --ad-brand: #3b82f6;
+            --ad-green: #22c55e;
+            --ad-violet: #8b5cf6;
+            --ad-rose: #f43f5e;
+            --ad-amber: #f59e0b;
+            --ad-up: #4ade80;
+            --ad-down: #fb7185;
+            --ad-c1: #3987e5;   /* serie 1 · azul    */
+            --ad-c2: #d95926;   /* serie 2 · naranja */
+            --ad-c3: #199e70;   /* serie 3 · aqua    */
+            --ad-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 12px 28px -18px rgba(0, 0, 0, 0.7);
+
+            /* Los formularios y pestañas ya existentes (Productos, POS,
+               Gastos, Ajustes) leen las variables de la tienda: aquí se
+               remapean para que adopten el mismo aspecto sin tocarlos. */
+            --bg-primary: var(--ad-bg);
+            --bg-secondary: var(--ad-card);
+            --bg-tertiary: var(--ad-card-2);
+            --bg-card: var(--ad-card);
+            --border-color: var(--ad-line);
+            --border: var(--ad-line);
+            --text-primary: var(--ad-text);
+            --text-secondary: var(--ad-muted);
+            --accent: var(--ad-brand);
+            --accent-hover: #2563eb;
+            --accent-glow: rgba(59, 130, 246, 0.3);
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --card-shadow: var(--ad-shadow);
+
+            width: 100%;
+            height: 100%;
+            max-width: none;
+            max-height: none;
+            border: 0;
+            border-radius: 0;
+            background: var(--ad-bg);
+            color: var(--ad-text);
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+            position: relative;
+        }
+        [data-theme="light"] .admin-panel {
+            --ad-bg: #eef2f8;
+            --ad-card: #ffffff;
+            --ad-card-2: #f4f7fb;
+            --ad-line: rgba(15, 23, 42, 0.09);
+            --ad-text: #0f172a;
+            --ad-muted: #5b6b82;
+            --ad-side: #0f1a3a;
+            --ad-up: #15803d;
+            --ad-down: #be123c;
+            --ad-c1: #2a78d6;
+            --ad-c2: #eb6834;
+            --ad-c3: #1baf7a;
+            --ad-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 10px 24px -16px rgba(15, 23, 42, 0.18);
+        }
+        .admin-panel button { font-family: inherit; }
+
+        /* --- Sidebar --- */
+        .admin-sidebar {
+            width: 248px;
+            flex-shrink: 0;
+            background: var(--ad-side);
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 1.1rem 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            overflow-y: auto;
+            z-index: 5;
+        }
+        .ad-brand { display: flex; align-items: center; gap: 0.7rem; padding: 0.3rem 0.5rem; color: #fff; }
+        .ad-brand-logo {
+            width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
+            display: grid; place-items: center; font-size: 1rem;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+        .ad-brand strong { display: block; font-size: 1rem; line-height: 1.15; }
+        .ad-brand small { font-size: 0.7rem; color: var(--ad-side-text); }
+        .admin-sidebar ul { list-style: none; display: flex; flex-direction: column; gap: 0.2rem; }
+        .admin-sidebar-link {
+            width: 100%;
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.7rem 0.85rem;
+            border: 0; border-radius: 10px;
+            background: transparent;
+            color: var(--ad-side-text);
+            font-size: 0.88rem; font-weight: 600; text-align: left;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+        .admin-sidebar-link i { width: 20px; text-align: center; font-size: 0.95rem; }
+        .admin-sidebar-link:hover { background: rgba(255, 255, 255, 0.07); color: #fff; }
+        .admin-sidebar-link:focus-visible { outline: 2px solid #93c5fd; outline-offset: 2px; }
+        .admin-sidebar-link.active { background: #2563eb; color: #fff; box-shadow: 0 8px 18px -10px rgba(37, 99, 235, 0.9); }
+        .ad-side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 0.6rem; }
+        .ad-side-foot .admin-sidebar-link { font-size: 0.82rem; }
+        .ad-rate {
+            padding: 0.6rem 0.8rem; border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--ad-side-text); font-size: 0.74rem; line-height: 1.35;
+        }
+        .ad-rate b { display: block; color: #fff; font-size: 0.82rem; }
+        .ad-scrim { display: none; }
+        .ad-mobile-only { display: none; }
+
+        /* --- Columna principal --- */
+        .admin-content { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; background: var(--ad-bg); }
+
+        .ad-header {
+            flex-shrink: 0;
+            display: flex; align-items: center; gap: 0.9rem;
+            min-height: 66px; padding: 0.6rem 1.5rem;
+            background: var(--ad-card);
+            border-bottom: 1px solid var(--ad-line);
+        }
+        .ad-menu-btn { display: none; }
+        .ad-title { min-width: 0; }
+        .ad-title [hidden] { display: none !important; }
+        .ad-title h2 { font-size: 1.1rem; font-weight: 800; line-height: 1.2; white-space: nowrap; }
+        .ad-title span { display: block; font-size: 0.75rem; color: var(--ad-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ad-search { position: relative; flex: 1; max-width: 360px; margin-left: auto; }
+        .ad-search i { position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); color: var(--ad-muted); font-size: 0.8rem; pointer-events: none; }
+        .ad-search input {
+            width: 100%; padding: 0.6rem 0.9rem 0.6rem 2.3rem;
+            border-radius: 10px; font-size: 0.85rem;
+            background: var(--ad-card-2) !important; border: 1px solid var(--ad-line) !important; color: var(--ad-text) !important;
+        }
+        .ad-actions { display: flex; align-items: center; gap: 0.45rem; }
+        .ad-actions .icon-btn { position: relative; background: var(--ad-card-2); }
+        .ad-badge {
+            position: absolute; top: -5px; right: -5px; min-width: 17px; height: 17px; padding: 0 4px;
+            border-radius: 9px; background: #ef4444; color: #fff; font-size: 0.65rem; font-weight: 800;
+            display: grid; place-items: center; border: 2px solid var(--ad-card);
+        }
+        .ad-badge[hidden] { display: none; }
+        .ad-user { display: flex; align-items: center; gap: 0.55rem; padding: 0.25rem 0.3rem 0.25rem 0.6rem; margin-left: 0.3rem; border-left: 1px solid var(--ad-line); }
+        .ad-avatar {
+            width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+            display: grid; place-items: center; font-weight: 800; font-size: 0.85rem; color: #fff;
+            background: linear-gradient(135deg, var(--ad-violet), var(--ad-brand));
+        }
+        .ad-user-name { font-size: 0.82rem; font-weight: 700; line-height: 1.15; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .ad-user-name small { display: block; font-size: 0.68rem; font-weight: 600; color: var(--ad-muted); }
+
+        .admin-body { flex: 1; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; padding: 1.25rem 1.5rem; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeIn 0.15s ease; }
+
+        .admin-footer {
+            flex-shrink: 0;
+            margin: 0;
+            display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.4rem 1rem;
+            padding: 0.7rem 1.5rem;
+            background: var(--ad-card);
+            border-top: 1px solid var(--ad-line);
+            color: var(--ad-muted); font-size: 0.74rem;
+        }
+        .admin-footer button { background: none; border: 0; color: var(--ad-muted); cursor: pointer; font-size: 0.74rem; }
+        .admin-footer button:hover { color: var(--ad-text); }
+
+        /* --- Pestañas heredadas: tarjetas de lista de productos --- */
+        .admin-item { background: var(--ad-card); border: 1px solid var(--ad-line); border-radius: 14px; box-shadow: var(--ad-shadow); }
+        .admin-search input,
+        .field input, .field select, .field textarea,
+        .admin-login input,
+        .admin-form .field input, .admin-form .field select, .admin-form .field textarea {
+            background: var(--ad-card-2) !important;
+            border: 1px solid var(--ad-line) !important;
+            color: var(--ad-text) !important;
+            border-radius: 10px;
+        }
+        .admin-search input:focus, .field input:focus, .field select:focus, .field textarea:focus,
+        .admin-login input:focus, .admin-form .field input:focus, .admin-form .field select:focus, .admin-form .field textarea:focus,
+        .ad-search input:focus {
+            border-color: var(--ad-brand) !important;
+            box-shadow: 0 0 0 3px var(--accent-glow) !important;
+            outline: none;
+        }
+
+        /* ==========================================
+           DASHBOARD
+           ========================================== */
+        .dash { display: flex; flex-direction: column; gap: 1rem; max-width: 1400px; margin: 0 auto; }
+        .dash.is-loading .dash-card { opacity: 0.6; transition: opacity 0.2s; }
+        .dash-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem; }
+        .dash-top h3 { font-size: 1rem; font-weight: 800; }
+        .dash-top p { font-size: 0.76rem; color: var(--ad-muted); }
+        .dash-top-actions { display: flex; align-items: center; gap: 0.5rem; }
+        .dash-chip { font-size: 0.74rem; padding: 0.35rem 0.65rem; border-radius: 999px; background: var(--ad-card); border: 1px solid var(--ad-line); color: var(--ad-muted); }
+        .dash-chip b { color: var(--ad-text); }
+        .dash-error { display: none; padding: 0.7rem 0.9rem; border-radius: 12px; font-size: 0.82rem; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.4); color: var(--ad-text); }
+        .dash-error.show { display: block; }
+
+        .dash-card {
+            background: var(--ad-card); border: 1px solid var(--ad-line); border-radius: 16px;
+            box-shadow: var(--ad-shadow); padding: 1.1rem 1.2rem; min-width: 0;
+        }
+        .dash-card h4 { font-size: 0.92rem; font-weight: 800; }
+        .dash-card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.8rem; }
+        .dash-card-head small { display: block; font-size: 0.72rem; font-weight: 500; color: var(--ad-muted); margin-top: 0.1rem; }
+        .dash-select {
+            font-size: 0.78rem; padding: 0.35rem 0.6rem; border-radius: 9px; cursor: pointer;
+            background: var(--ad-card-2); color: var(--ad-text); border: 1px solid var(--ad-line);
+        }
+
+        .dash-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+        .kpi { display: flex; gap: 0.85rem; align-items: flex-start; }
+        .kpi-icon { width: 46px; height: 46px; border-radius: 13px; flex-shrink: 0; display: grid; place-items: center; font-size: 1.1rem; color: #fff; }
+        .kpi-blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .kpi-green { background: linear-gradient(135deg, #22c55e, #15803d); }
+        .kpi-violet { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+        .kpi-rose { background: linear-gradient(135deg, #fb7185, #e11d48); }
+        .kpi-body { min-width: 0; }
+        .kpi-label { font-size: 0.74rem; font-weight: 600; color: var(--ad-muted); }
+        .kpi-value { font-size: 1.35rem; font-weight: 800; line-height: 1.25; margin: 0.1rem 0; overflow-wrap: anywhere; }
+        .kpi-sub { font-size: 0.72rem; color: var(--ad-muted); }
+        .kpi-trend { font-size: 0.74rem; font-weight: 700; margin-top: 0.15rem; display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap; }
+        .kpi-trend small { font-weight: 500; color: var(--ad-muted); }
+        .trend-up { color: var(--ad-up); }
+        .trend-down { color: var(--ad-down); }
+        .trend-flat { color: var(--ad-muted); }
+
+        .dash-grid-2 { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: 1rem; }
+        .dash-grid-3 { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
+
+        /* Gráfico de ventas */
+        .chart-legend { display: flex; flex-wrap: wrap; gap: 0.9rem; font-size: 0.74rem; color: var(--ad-muted); margin-bottom: 0.4rem; }
+        .chart-legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+        .chart-legend i { display: inline-block; width: 14px; height: 0; border-top: 3px solid var(--ad-c1); border-radius: 2px; }
+        .chart-legend i.dash { border-top: 2px dashed var(--ad-c3); }
+        .sales-chart { position: relative; width: 100%; min-height: 250px; overflow: hidden; }
+        .sales-chart svg { display: block; width: 100%; overflow: visible; }
+        .sales-chart text { font-family: inherit; }
+        .chart-axis { fill: var(--ad-muted); font-size: 11px; }
+        .chart-grid { stroke: var(--ad-line); stroke-width: 1; }
+        .chart-tip {
+            position: absolute; z-index: 3; pointer-events: none; display: none;
+            min-width: 150px; padding: 0.55rem 0.7rem; border-radius: 10px; font-size: 0.74rem; line-height: 1.5;
+            background: var(--ad-card); border: 1px solid var(--ad-line); box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.5); color: var(--ad-text);
+        }
+        .chart-tip b { display: block; margin-bottom: 0.15rem; font-size: 0.76rem; }
+        .chart-tip span { display: flex; justify-content: space-between; gap: 0.8rem; color: var(--ad-muted); }
+        .chart-tip span em { font-style: normal; font-weight: 700; color: var(--ad-text); }
+        .chart-empty { position: absolute; inset: 0; display: none; place-items: center; text-align: center; font-size: 0.82rem; color: var(--ad-muted); padding: 1rem; }
+        .chart-empty.show { display: grid; }
+
+        /* Donut */
+        .seg { display: inline-flex; padding: 3px; border-radius: 10px; background: var(--ad-card-2); border: 1px solid var(--ad-line); }
+        .seg button { border: 0; background: transparent; color: var(--ad-muted); font-size: 0.74rem; font-weight: 700; padding: 0.28rem 0.7rem; border-radius: 7px; cursor: pointer; }
+        .seg button[aria-pressed="true"] { background: var(--ad-brand); color: #fff; }
+        .donut-wrap { display: flex; align-items: center; gap: 1.1rem; flex-wrap: wrap; justify-content: center; }
+        .donut { width: 168px; height: 168px; flex-shrink: 0; }
+        .donut text { font-family: inherit; }
+        .donut-legend { flex: 1; min-width: 150px; list-style: none; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.8rem; }
+        .donut-legend li { display: grid; grid-template-columns: 10px 1fr auto; align-items: center; gap: 0.5rem; }
+        .donut-legend .dot { width: 10px; height: 10px; border-radius: 3px; }
+        .donut-legend small { display: block; color: var(--ad-muted); font-size: 0.7rem; }
+        .donut-legend b { font-weight: 800; }
+
+        /* Tabla de ventas recientes */
+        .tbl-wrap { overflow-x: auto; }
+        .ad-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        .ad-table th { text-align: left; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.02em; color: var(--ad-muted); padding: 0.5rem 0.55rem; border-bottom: 1px solid var(--ad-line); white-space: nowrap; }
+        .ad-table td { padding: 0.62rem 0.55rem; border-bottom: 1px solid var(--ad-line); white-space: nowrap; }
+        .ad-table tr:last-child td { border-bottom: 0; }
+        .ad-table .num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+        .ad-table td.id { font-weight: 700; color: var(--ad-brand); }
+        .pill { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.18rem 0.55rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700; }
+        .pill-cash { background: rgba(34, 197, 94, 0.15); color: var(--ad-up); }
+        .pill-digital { background: rgba(139, 92, 246, 0.16); color: #a78bfa; }
+        .pill-neutral { background: var(--ad-card-2); color: var(--ad-muted); }
+        [data-theme="light"] .pill-digital { color: #6d28d9; }
+        .tbl-empty { padding: 1.6rem 0.5rem; text-align: center; color: var(--ad-muted); font-size: 0.82rem; }
+
+        /* Top productos */
+        .top-list { list-style: none; display: flex; flex-direction: column; gap: 0.85rem; }
+        .top-item { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 0.7rem; align-items: center; }
+        .top-thumb { width: 40px; height: 40px; border-radius: 10px; background: var(--ad-card-2); display: grid; place-items: center; overflow: hidden; color: var(--ad-muted); }
+        .top-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .top-name { font-size: 0.82rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .top-bar { height: 6px; border-radius: 3px; background: var(--ad-card-2); margin-top: 0.35rem; overflow: hidden; }
+        .top-bar i { display: block; height: 100%; border-radius: 3px; background: var(--ad-c1); }
+        .top-units { font-size: 0.74rem; color: var(--ad-muted); white-space: nowrap; }
+        .top-units b { color: var(--ad-text); font-size: 0.82rem; }
+
+        /* Resumen financiero */
+        .fin-table td:first-child { color: var(--ad-muted); }
+        .fin-table .total td { font-weight: 800; border-top: 1px solid var(--ad-line); }
+        .fin-pos { color: var(--ad-up); }
+        .fin-neg { color: var(--ad-down); }
+
+        /* --- Adaptación a pantallas más pequeñas --- */
+        @media (max-width: 1180px) {
+            .dash-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .dash-grid-2, .dash-grid-3 { grid-template-columns: minmax(0, 1fr); }
+        }
+        @media (max-width: 900px) {
+            .admin-sidebar {
+                position: absolute; top: 0; bottom: 0; left: 0; width: 264px;
+                transform: translateX(-100%); transition: transform 0.22s ease;
+                box-shadow: 12px 0 40px rgba(0, 0, 0, 0.5);
             }
-            .admin-header-actions { justify-content: flex-end; }
+            .admin-panel.ad-open .admin-sidebar { transform: translateX(0); }
+            .admin-panel.ad-open .ad-scrim { display: block; position: absolute; inset: 0; z-index: 4; background: rgba(2, 6, 14, 0.6); }
+            .ad-menu-btn { display: grid; flex-shrink: 0; }
+            .ad-search { display: none; }
+            .ad-title { flex: 1; }
+            .ad-user-name { display: none; }
+            .ad-actions { margin-left: auto; }
+        }
+        @media (max-width: 640px) {
+            .ad-header { padding: 0.5rem 0.8rem; gap: 0.55rem; }
+            .ad-actions { gap: 0.3rem; }
+            .ad-actions .icon-btn { width: 34px; height: 34px; }
+            .ad-header #adminImportBtn, .ad-header #adminExportBtn { display: none; }
+            .ad-mobile-only { display: flex; }
+            .ad-user { display: none; }
+            .admin-footer span + span { display: none; }
+            .ad-title span { display: none; }
+            .admin-body { padding: 0.9rem 0.8rem; }
+            .dash-kpis { gap: 0.65rem; }
+            .dash-card { padding: 0.9rem; }
+            .kpi { flex-direction: column; gap: 0.55rem; }
+            .kpi-icon { width: 38px; height: 38px; font-size: 0.95rem; }
+            .kpi-value { font-size: 1.1rem; }
+            .col-origin { display: none; }
+            .admin-footer { justify-content: center; text-align: center; padding: 0.55rem 0.8rem; }
             .admin-form { grid-template-columns: minmax(0, 1fr); }
             .admin-item { grid-template-columns: 48px minmax(0, 1fr); grid-auto-rows: auto; }
             .admin-item-price { grid-column: 2; }
             .admin-item-actions { grid-column: 2; }
         }
+        @media (prefers-reduced-motion: reduce) {
+            .admin-sidebar, .tab-panel.active { transition: none; animation: none; }
+        }
+
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
     </style>
     
     <!-- Google tag (gtag.js) -->
@@ -2749,33 +3051,60 @@
         <!-- Vista: Panel -->
         <div class="admin-panel" id="adminPanelView" style="display: none;">
 
-            <div class="admin-header">
-                <div class="admin-header-title">
-                    <i class="fa-solid fa-boxes-stacked"></i>
-                    <div>
-                        <h3>Gestión de Catálogo</h3>
-                        <span id="adminProductCount">0 productos</span>
-                    </div>
+            <!-- Sidebar -->
+            <aside class="admin-sidebar" id="adminSidebar" aria-label="Navegación del panel">
+                <div class="ad-brand">
+                    <span class="ad-brand-logo"><i class="fa-solid fa-store"></i></span>
+                    <div><strong>VentasCel</strong><small>Panel de administración</small></div>
                 </div>
-                <nav class="admin-tabs" role="tablist" aria-label="Panel de administración" style="width:100%;margin-top:0.6rem;">
-                    <button class="tab-btn" role="tab" aria-selected="true" aria-controls="tab-productos" id="tab-btn-productos" onclick="switchAdminTab('productos')"><i class="fa-solid fa-boxes-stacked" style="margin-right:0.25rem;"></i>Productos</button>
-                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-pos" id="tab-btn-pos" onclick="switchAdminTab('pos')"><i class="fa-solid fa-cash-register" style="margin-right:0.25rem;"></i>POS</button>
-                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-gastos" id="tab-btn-gastos" onclick="switchAdminTab('gastos')"><i class="fa-solid fa-receipt" style="margin-right:0.25rem;"></i>Gastos</button>
-                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-dashboard" id="tab-btn-dashboard" onclick="switchAdminTab('dashboard')"><i class="fa-solid fa-chart-line" style="margin-right:0.25rem;"></i>Dashboard / Métricas</button>
-                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-ajustes" id="tab-btn-ajustes" onclick="switchAdminTab('ajustes')"><i class="fa-solid fa-gear" style="margin-right:0.25rem;"></i>Ajustes</button>
+                <nav aria-label="Secciones">
+                    <ul>
+                        <li><button type="button" class="admin-sidebar-link" data-tab="dashboard" onclick="switchAdminTab('dashboard')"><i class="fa-solid fa-gauge-high"></i> <span>Dashboard</span></button></li>
+                        <li><button type="button" class="admin-sidebar-link" data-tab="productos" onclick="switchAdminTab('productos')"><i class="fa-solid fa-boxes-stacked"></i> <span>Productos</span></button></li>
+                        <li><button type="button" class="admin-sidebar-link" data-tab="pos" onclick="switchAdminTab('pos')"><i class="fa-solid fa-cash-register"></i> <span>POS</span></button></li>
+                        <li><button type="button" class="admin-sidebar-link" data-tab="gastos" onclick="switchAdminTab('gastos')"><i class="fa-solid fa-receipt"></i> <span>Gastos</span></button></li>
+                        <li><button type="button" class="admin-sidebar-link" data-tab="ajustes" onclick="switchAdminTab('ajustes')"><i class="fa-solid fa-gear"></i> <span>Ajustes</span></button></li>
+                    </ul>
                 </nav>
-                <div class="admin-header-actions">
-                    <button class="icon-btn" id="adminExportBtn" title="Descargar copia de respaldo del catálogo (JSON)"><i class="fa-solid fa-download"></i></button>
-                    <button class="icon-btn" id="adminImportBtn" title="Importar catálogo (JSON)"><i class="fa-solid fa-upload"></i></button>
+                <div class="ad-side-foot">
+                    <div class="ad-rate">Tasa de cambio<b id="adSideRate">—</b></div>
+                    <button type="button" class="admin-sidebar-link ad-mobile-only" onclick="document.getElementById('adminExportBtn').click()"><i class="fa-solid fa-download"></i> <span>Exportar copia (JSON)</span></button>
+                    <button type="button" class="admin-sidebar-link ad-mobile-only" onclick="document.getElementById('adminImportBtn').click()"><i class="fa-solid fa-upload"></i> <span>Importar catálogo</span></button>
+                    <button type="button" class="admin-sidebar-link" onclick="closeAdminPanel()"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>Ver tienda</span></button>
+                </div>
+            </aside>
+            <div class="ad-scrim" id="adminScrim"></div>
+
+            <div class="admin-content">
+            <div class="ad-header">
+                <button type="button" class="icon-btn ad-menu-btn" id="adminMenuBtn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+                <div class="ad-title">
+                    <h2 id="adTitle">Dashboard</h2>
+                    <span id="adSub">Resumen de ventas, ganancias y gastos</span>
+                    <span id="adminProductCount" hidden>0 productos</span>
+                </div>
+                <label class="ad-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="search" id="adminGlobalSearch" placeholder="Buscar producto…" aria-label="Buscar producto">
+                </label>
+                <div class="ad-actions">
+                    <button type="button" class="icon-btn" id="adminBellBtn" title="Productos con stock bajo o agotados" aria-label="Avisos de stock"><i class="fa-regular fa-bell"></i><span class="ad-badge" id="adminBellBadge" hidden>0</span></button>
+                    <button type="button" class="icon-btn" id="adminThemeBtn" title="Cambiar tema" aria-label="Cambiar tema"><i class="fa-solid fa-circle-half-stroke"></i></button>
+                    <button type="button" class="icon-btn" id="adminExportBtn" title="Descargar copia de respaldo del catálogo (JSON)"><i class="fa-solid fa-download"></i></button>
+                    <button type="button" class="icon-btn" id="adminImportBtn" title="Importar catálogo (JSON)"><i class="fa-solid fa-upload"></i></button>
                     <input type="file" id="adminImportFile" accept=".json,application/json" hidden>
-                    <button class="icon-btn" id="adminLogoutBtn" title="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
-                    <button class="icon-btn danger" id="adminCloseBtn" title="Cerrar panel (Esc)" aria-label="Cerrar panel de administración"><i class="fa-solid fa-xmark"></i></button>
+                    <div class="ad-user">
+                        <span class="ad-avatar" id="adminAvatar">A</span>
+                        <span class="ad-user-name"><span id="adminUserName">Admin</span><small>Administrador</small></span>
+                    </div>
+                    <button type="button" class="icon-btn" id="adminLogoutBtn" title="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
+                    <button type="button" class="icon-btn danger" id="adminCloseBtn" title="Cerrar panel (Esc)" aria-label="Cerrar panel de administración"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
 
             <div class="admin-body">
 
-                <div id="tab-productos" class="tab-panel active" role="tabpanel" aria-labelledby="tab-btn-productos">
+                <div id="tab-productos" class="tab-panel active" role="tabpanel">
 
                 <!-- Vista lista -->
                 <div class="admin-list-view" id="adminListView">
@@ -2882,7 +3211,7 @@
                 </div> <!-- cierre #tab-productos -->
 
                 <!-- POS -->
-                <div id="tab-pos" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-pos">
+                <div id="tab-pos" class="tab-panel" role="tabpanel">
                     <div style="padding:0.5rem 0;">
                         <h2 style="font-size:1.05rem; font-weight:800; margin-bottom:0.35rem;">Punto de Venta (POS)</h2>
                         <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.6rem;">Buscá el producto, agregalo al carrito y cobrá con <code>register_sale</code>.</p>
@@ -2927,7 +3256,7 @@
                 </div>
 
                 <!-- Gastos -->
-                <div id="tab-gastos" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-gastos">
+                <div id="tab-gastos" class="tab-panel" role="tabpanel">
                     <h2 style="font-size:1.05rem;font-weight:800;margin:0 0 0.6rem;">Gastos Operativos</h2>
                     <form id="expenseForm" onsubmit="submitExpense(event)" style="display:grid;gap:0.45rem;margin-bottom:0.7rem;max-width:420px;">
                         <div>
@@ -2954,40 +3283,126 @@
                     <div id="expenseList" style="font-size:0.85rem;line-height:1.35;"></div>
                 </div>
 
-                <!-- Dashboard / Métricas -->
-                <div id="tab-dashboard" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-dashboard">
-                    <div style="padding:1rem 0.5rem; max-width:100%; overflow-x:hidden;">
-                        <h2 style="font-size:1.1rem; font-weight:800; margin-bottom:0.75rem; color:var(--text-primary);">Dashboard / Métricas</h2>
-                        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:1rem;">Consolidado con datos de la base de datos. Si no hay registros, se muestra 0.</p>
+                <!-- Dashboard -->
+                <div id="tab-dashboard" class="tab-panel" role="tabpanel">
+                    <div class="dash" id="dashRoot">
 
-                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:0.6rem; margin-bottom:1rem;">
-                            <div style="border:1px solid var(--border); border-radius:0.5rem; padding:0.7rem; background:var(--bg-secondary);"><div style="font-size:0.7rem; color:var(--text-secondary);">Ventas hoy (CUP)</div><div id="dash-cup-today" style="font-weight:800; font-size:1rem;">0.00</div></div>
-                            <div style="border:1px solid var(--border); border-radius:0.5rem; padding:0.7rem; background:var(--bg-secondary);"><div style="font-size:0.7rem; color:var(--text-secondary);">Ventas hoy (USD)</div><div id="dash-usd-today" style="font-weight:800; font-size:1rem;">0.00</div></div>
-                            <div style="border:1px solid var(--border); border-radius:0.5rem; padding:0.7rem; background:var(--bg-secondary);"><div style="font-size:0.7rem; color:var(--text-secondary);">Ventas mes (CUP)</div><div id="dash-cup-month" style="font-weight:800; font-size:1rem;">0.00</div></div>
-                            <div style="border:1px solid var(--border); border-radius:0.5rem; padding:0.7rem; background:var(--bg-secondary);"><div style="font-size:0.7rem; color:var(--text-secondary);">Ventas mes (USD)</div><div id="dash-usd-month" style="font-weight:800; font-size:1rem;">0.00</div></div>
-                            <div style="border:1px solid var(--border); border-radius:0.5rem; padding:0.7rem; background:var(--bg-secondary);"><div style="font-size:0.7rem; color:var(--text-secondary);">Ganancia hoy (CUP)</div><div id="dash-profit-today" style="font-weight:800; font-size:1rem;">0.00</div></div>
-                            <div style="border:1px solid var(--border); border-radius:0.5rem; padding:0.7rem; background:var(--bg-secondary);"><div style="font-size:0.7rem; color:var(--text-secondary);">Ganancia mes (CUP)</div><div id="dash-profit-month" style="font-weight:800; font-size:1rem;">0.00</div></div>
+                        <div class="dash-top">
+                            <div>
+                                <h3>Resumen del negocio</h3>
+                                <p id="dashUpdated">Cargando datos…</p>
+                            </div>
+                            <div class="dash-top-actions">
+                                <span class="dash-chip">Hoy: <b id="dashTodayLine">—</b></span>
+                                <button type="button" class="icon-btn" id="dashRefreshBtn" title="Actualizar datos" aria-label="Actualizar datos"><i class="fa-solid fa-rotate"></i></button>
+                            </div>
                         </div>
 
-                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:0.6rem; margin-bottom:1rem;">
-                            <div style="border:1px solid var(--border); border-radius:0.5rem; padding:0.7rem; background:var(--bg-secondary);"><div style="font-size:0.7rem; color:var(--text-secondary);">Efectivo hoy / mes (CUP)</div><div id="dash-pay-cash" style="font-weight:700; font-size:0.9rem;">0.00 / 0.00</div></div>
-                            <div style="border:1px solid var(--border); border-radius:0.5rem; padding:0.7rem; background:var(--bg-secondary);"><div style="font-size:0.7rem; color:var(--text-secondary);">Digital hoy / mes (CUP)</div><div id="dash-pay-digital" style="font-weight:700; font-size:0.9rem;">0.00 / 0.00</div></div>
-                            <div style="border:1px solid var(--border); border-radius:0.5rem; padding:0.7rem; background:var(--bg-secondary);"><div style="font-size:0.7rem; color:var(--text-secondary);">Físico hoy / mes (CUP)</div><div id="dash-origin-physical" style="font-weight:700; font-size:0.9rem;">0.00 / 0.00</div></div>
-                            <div style="border:1px solid var(--border); border-radius:0.5rem; padding:0.7rem; background:var(--bg-secondary);"><div style="font-size:0.7rem; color:var(--text-secondary);">Online hoy / mes (CUP)</div><div id="dash-origin-online" style="font-weight:700; font-size:0.9rem;">0.00 / 0.00</div></div>
+                        <div class="dash-error" id="dashError" role="alert"></div>
+
+                        <!-- Tarjetas de resumen -->
+                        <section class="dash-kpis" aria-label="Resumen">
+                            <article class="dash-card kpi">
+                                <span class="kpi-icon kpi-blue"><i class="fa-solid fa-dollar-sign"></i></span>
+                                <div class="kpi-body">
+                                    <div class="kpi-label">Ingresos del mes</div>
+                                    <div class="kpi-value" id="kpiRevenue">—</div>
+                                    <div class="kpi-sub" id="kpiRevenueSub">&nbsp;</div>
+                                    <div class="kpi-trend" id="kpiRevenueTrend"></div>
+                                </div>
+                            </article>
+                            <article class="dash-card kpi">
+                                <span class="kpi-icon kpi-green"><i class="fa-solid fa-cart-shopping"></i></span>
+                                <div class="kpi-body">
+                                    <div class="kpi-label">Ventas del mes</div>
+                                    <div class="kpi-value" id="kpiOrders">—</div>
+                                    <div class="kpi-sub" id="kpiOrdersSub">&nbsp;</div>
+                                    <div class="kpi-trend" id="kpiOrdersTrend"></div>
+                                </div>
+                            </article>
+                            <article class="dash-card kpi">
+                                <span class="kpi-icon kpi-violet"><i class="fa-solid fa-wallet"></i></span>
+                                <div class="kpi-body">
+                                    <div class="kpi-label">Balance neto del mes</div>
+                                    <div class="kpi-value" id="kpiNet">—</div>
+                                    <div class="kpi-sub" id="kpiNetSub">&nbsp;</div>
+                                    <div class="kpi-trend" id="kpiNetTrend"></div>
+                                </div>
+                            </article>
+                            <article class="dash-card kpi">
+                                <span class="kpi-icon kpi-rose"><i class="fa-solid fa-box"></i></span>
+                                <div class="kpi-body">
+                                    <div class="kpi-label">Productos activos</div>
+                                    <div class="kpi-value" id="kpiProducts">—</div>
+                                    <div class="kpi-sub" id="kpiProductsSub">&nbsp;</div>
+                                    <div class="kpi-trend" id="kpiProductsTrend"></div>
+                                </div>
+                            </article>
+                        </section>
+
+                        <!-- Gráfico + estado -->
+                        <div class="dash-grid-2">
+                            <section class="dash-card" aria-labelledby="salesTitle">
+                                <div class="dash-card-head">
+                                    <h4 id="salesTitle">Resumen de ventas<small>Ingresos y ganancia en CUP</small></h4>
+                                    <select class="dash-select" id="salesRange" aria-label="Periodo del gráfico">
+                                        <option value="6m">Últimos 6 meses</option>
+                                        <option value="30d">Últimos 30 días</option>
+                                        <option value="7d">Últimos 7 días</option>
+                                    </select>
+                                </div>
+                                <div class="chart-legend"><span><i></i>Ingresos</span><span><i class="dash"></i>Ganancia</span></div>
+                                <div class="sales-chart" id="salesChart">
+                                    <div class="chart-tip" id="salesTip" role="status"></div>
+                                    <div class="chart-empty" id="salesEmpty">Aún no hay ventas en este periodo.</div>
+                                </div>
+                            </section>
+
+                            <section class="dash-card" aria-labelledby="splitTitle">
+                                <div class="dash-card-head">
+                                    <h4 id="splitTitle">Ventas del mes<small id="splitSub">Por método de pago</small></h4>
+                                    <div class="seg" role="group" aria-label="Agrupar por">
+                                        <button type="button" id="splitPay" aria-pressed="true">Pago</button>
+                                        <button type="button" id="splitOrigin" aria-pressed="false">Origen</button>
+                                    </div>
+                                </div>
+                                <div class="donut-wrap">
+                                    <svg class="donut" viewBox="0 0 120 120" role="img" aria-label="Reparto de las ventas del mes" id="donutSvg"></svg>
+                                    <ul class="donut-legend" id="donutLegend"></ul>
+                                </div>
+                            </section>
                         </div>
 
-                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:0.6rem; margin-bottom:1rem;">
-                            <div style="border:1px solid var(--border); border-radius:0.5rem; padding:0.7rem; background:var(--bg-secondary);"><div style="font-size:0.7rem; color:var(--text-secondary);">Balance neto hoy (CUP)</div><div id="dash-net-today" style="font-weight:800; font-size:1rem;">0.00</div></div>
-                            <div style="border:1px solid var(--border); border-radius:0.5rem; padding:0.7rem; background:var(--bg-secondary);"><div style="font-size:0.7rem; color:var(--text-secondary);">Balance neto mes (CUP)</div><div id="dash-net-month" style="font-weight:800; font-size:1rem;">0.00</div></div>
-                        </div>
+                        <!-- Ventas recientes + top productos + finanzas -->
+                        <div class="dash-grid-3">
+                            <section class="dash-card" aria-labelledby="recentTitle">
+                                <div class="dash-card-head"><h4 id="recentTitle">Ventas recientes</h4></div>
+                                <div class="tbl-wrap">
+                                    <table class="ad-table">
+                                        <thead><tr><th>ID</th><th>Fecha</th><th class="col-origin">Origen</th><th>Pago</th><th class="num" style="text-align:right;">Total</th></tr></thead>
+                                        <tbody id="recentBody"><tr><td colspan="5" class="tbl-empty">Cargando…</td></tr></tbody>
+                                    </table>
+                                </div>
+                            </section>
 
-                        <h3 style="font-size:0.85rem; font-weight:700; margin:0.5rem 0 0.35rem; text-align:left; color:var(--text-primary);">Últimas ventas</h3>
-                        <div id="dash-sales-list" style="font-size:0.8rem; text-align:left; border:1px solid var(--border); border-radius:0.5rem; padding:0.5rem; background:var(--bg-secondary); overflow-x:auto;"></div>
+                            <section class="dash-card" aria-labelledby="topTitle">
+                                <div class="dash-card-head"><h4 id="topTitle">Más vendidos<small>Unidades este mes</small></h4></div>
+                                <ul class="top-list" id="topList"><li class="tbl-empty">Cargando…</li></ul>
+                            </section>
+
+                            <section class="dash-card" aria-labelledby="finTitle">
+                                <div class="dash-card-head"><h4 id="finTitle">Finanzas</h4></div>
+                                <table class="ad-table fin-table">
+                                    <thead><tr><th></th><th class="num" style="text-align:right;">Hoy</th><th class="num" style="text-align:right;">Mes</th></tr></thead>
+                                    <tbody id="finBody"></tbody>
+                                </table>
+                            </section>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Ajustes -->
-                <div id="tab-ajustes" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-ajustes">
+                <div id="tab-ajustes" class="tab-panel" role="tabpanel">
                     <div style="padding:1.25rem; max-width:28rem; margin:0 auto;">
                         <h2 style="font-size:1.05rem; font-weight:800; margin-bottom:0.25rem;">Ajustes</h2>
                         <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:1rem;">Tasa configurable sin tocar código. Al guardar, el servidor recalcula <code>price_usd</code> y <code>old_price_usd</code> de todo el catálogo.</p>
@@ -3006,6 +3421,11 @@
                 </div>
 
             </div>
+
+            <footer class="admin-footer">
+                <span>© <span id="adYear">2026</span> VentasCel. Todos los derechos reservados.</span>
+                <span>Panel de administración</span>
+            </footer>
         </div>
     </div>
 
@@ -4256,7 +4676,13 @@
             document.getElementById('adminPanelView').style.display = 'flex';
             /* Si había algo escrito sin guardar, se conserva y se vuelve
                a mostrar el formulario (RF-29). */
-            if (!restoreAdminFormDraft()) backToAdminList();
+            const restored = restoreAdminFormDraft();
+            if (!restored) backToAdminList();
+            /* Se abre en el Dashboard, salvo que haya un formulario a medias. */
+            switchAdminTab(restored ? 'productos' : 'dashboard');
+            refreshAdminUser();
+            const year = document.getElementById('adYear');
+            if (year) year.textContent = String(new Date().getFullYear());
         }
 
         async function attemptAdminLogin(event) {
@@ -4522,14 +4948,40 @@
             document.querySelector('.admin-body').scrollTop = 0;
         }
 
+        let adCurrentTab = 'dashboard';
+        const AD_TITLES = {
+            dashboard: ['Dashboard', 'Resumen de ventas, ganancias y gastos'],
+            productos: ['Productos', 'Gestión del catálogo'],
+            pos: ['Punto de venta', 'Cobra ventas en el local'],
+            gastos: ['Gastos', 'Registra los gastos operativos'],
+            ajustes: ['Ajustes', 'Tasa de cambio y configuración']
+        };
+        function updateAdminTitle(name) {
+            const info = AD_TITLES[name] || ['Panel', ''];
+            const title = document.getElementById('adTitle');
+            const sub = document.getElementById('adSub');
+            const counter = document.getElementById('adminProductCount');
+            if (title) title.textContent = info[0];
+            if (sub) sub.textContent = (name === 'productos' && counter && counter.textContent) ? counter.textContent : info[1];
+        }
+
         function switchAdminTab(name) {
             const tabs = ['productos','pos','gastos','dashboard','ajustes'];
+            adCurrentTab = name;
             tabs.forEach(t => {
-                const btn = document.getElementById('tab-btn-'+t);
                 const panel = document.getElementById('tab-'+t);
-                if (btn) btn.setAttribute('aria-selected', t === name ? 'true' : 'false');
                 if (panel) panel.classList.toggle('active', t === name);
             });
+            document.querySelectorAll('.admin-sidebar-link[data-tab]').forEach(l => {
+                const isActive = (l.getAttribute('data-tab') === name);
+                l.classList.toggle('active', isActive);
+                l.setAttribute('aria-current', isActive ? 'page' : 'false');
+            });
+            updateAdminTitle(name);
+            const shell = document.getElementById('adminPanelView');
+            if (shell) shell.classList.remove('ad-open');
+            const body = document.querySelector('.admin-body');
+            if (body) body.scrollTop = 0;
             if (name === 'ajustes') loadAdjustmentRate();
         }
 
@@ -4591,6 +5043,7 @@
                 if (msg) { msg.textContent = 'Tasa guardada: ' + v.value.toFixed(2) + ' CUP/USD. El trigger settings_rate_trg recalcula price_usd/old_price_usd de todo el catálogo en la base de datos.'; msg.style.color = '#22c55e'; }
                 window.posRate = v.value;
                 await loadAdjustmentRate();
+                try { await loadDashboard(); } catch (e) { /* ignorar */ }
             } catch (e) {
                 if (msg) { msg.textContent = 'No se guardó: ' + (e.message || e); msg.style.color = '#dc2626'; }
             }
@@ -5835,58 +6288,420 @@
             }
         }
 
-        async function loadDashboard() {
+        /* ==========================================
+           DASHBOARD
+           Los cálculos viven en catalog-core.js (dashboardData,
+           topProductsByUnits: funciones puras y con tests). Aquí
+           solo se pide la información a la base de datos y se pinta.
+           ========================================== */
+        const DASH_LOW_STOCK = 3;                 /* ≤ 3 unidades = stock bajo */
+        const DASH_MONTHS_ES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+        const DASH_MONTHS_LONG = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+        const dashState = { data: null, sales: [], products: null, top: null, range: '6m', split: 'pay', loading: false, rate: null };
+        const dashEl = id => document.getElementById(id);
+
+        function dashEsc(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+        function dashPad(n) { return String(n).padStart(2, '0'); }
+        function dashTodayKey(now) { return now.getFullYear() + '-' + dashPad(now.getMonth() + 1) + '-' + dashPad(now.getDate()); }
+        function dashPercent(value) { return String(Math.abs(value)).replace('.', ',') + '%'; }
+        function dashCompact(n) {
+            const abs = Math.abs(n);
+            if (abs >= 1e6) return (n / 1e6).toFixed(1).replace('.', ',').replace(',0', '') + ' M';
+            if (abs >= 1e3) return (n / 1e3).toFixed(abs >= 1e4 ? 0 : 1).replace('.', ',').replace(',0', '') + ' k';
+            return String(Math.round(n));
+        }
+        function dashNiceStep(raw) {
+            if (!(raw > 0)) return 250;
+            const pow = Math.pow(10, Math.floor(Math.log10(raw)));
+            const f = raw / pow;
+            return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * pow;
+        }
+        function dashCup(value) { const core = window.VentasCelCore; return (core && core.formatCup(value)) || '0 CUP'; }
+        function dashUsd(value) { const core = window.VentasCelCore; return (core && core.formatUsd(value)) || '0,00 USD'; }
+        function dashDateTime(iso) {
+            const d = new Date(iso);
+            if (isNaN(d)) return '';
+            return d.getDate() + ' ' + DASH_MONTHS_ES[d.getMonth()] + ', ' + dashPad(d.getHours()) + ':' + dashPad(d.getMinutes());
+        }
+
+        /* Productos con el formato del cliente: los de la base de datos
+           (cargados por el dashboard) o, mientras tanto, los del panel. */
+        function dashProducts() {
+            if (Array.isArray(dashState.products)) return dashState.products;
+            return Array.isArray(adminCatalog) ? adminCatalog : [];
+        }
+
+        /* Aviso de stock en la campana de la cabecera. */
+        function refreshAdminBell() {
+            const badge = dashEl('adminBellBadge');
+            if (!badge) return;
+            const alerts = dashProducts().filter(p => p && p.active !== false && p.stock !== null && p.stock !== undefined && p.stock <= DASH_LOW_STOCK).length;
+            badge.hidden = alerts === 0;
+            badge.textContent = alerts > 99 ? '99+' : String(alerts);
+        }
+
+        function refreshAdminUser() {
+            const user = adminSession && adminSession.user;
+            const email = (user && user.email) || '';
+            const name = email ? email.split('@')[0] : 'Admin';
+            const nameEl = dashEl('adminUserName');
+            const avatar = dashEl('adminAvatar');
+            if (nameEl) nameEl.textContent = name;
+            if (avatar) avatar.textContent = (name.charAt(0) || 'A').toUpperCase();
+        }
+
+        async function dashFetchAll(buildQuery) {
+            const PAGE = 1000;
+            const rows = [];
+            for (let page = 0; page < 10; page++) {
+                const { data, error } = await buildQuery().range(page * PAGE, page * PAGE + PAGE - 1);
+                if (error) throw error;
+                const list = Array.isArray(data) ? data : [];
+                rows.push.apply(rows, list);
+                if (list.length < PAGE) break;
+            }
+            return rows;
+        }
+
+        function dashTrend(value, hasBase) {
+            if (!hasBase || value === null || value === undefined) return '<span class="trend-flat">Sin datos del mes anterior</span>';
+            if (value === 0) return '<span class="trend-flat"><i class="fa-solid fa-minus"></i> 0%</span> <small>vs. mes anterior</small>';
+            const up = value > 0;
+            return '<span class="' + (up ? 'trend-up' : 'trend-down') + '"><i class="fa-solid fa-arrow-' + (up ? 'trend-up' : 'trend-down') + '"></i> ' + (up ? '+' : '−') + dashPercent(value) + '</span> <small>vs. mismo tramo del mes anterior</small>';
+        }
+
+        function dashRenderKpis() {
+            const data = dashState.data;
+            if (!data) return;
+            const set = (id, html) => { const el = dashEl(id); if (el) el.innerHTML = html; };
+            set('kpiRevenue', dashCup(data.month.revenue));
+            set('kpiRevenueSub', '≈ ' + dashUsd(data.month.usd));
+            set('kpiRevenueTrend', dashTrend(data.trends.revenue, true));
+            set('kpiOrders', String(data.month.orders));
+            set('kpiOrdersSub', 'Hoy: ' + data.today.orders + ' · ' + dashCup(data.today.revenue));
+            set('kpiOrdersTrend', dashTrend(data.trends.orders, true));
+            set('kpiNet', dashCup(data.month.net));
+            set('kpiNetSub', 'Ganancia ' + dashCup(data.month.profit) + ' − gastos ' + dashCup(data.month.expenses));
+            set('kpiNetTrend', dashTrend(data.trends.net, true));
+            set('dashTodayLine', data.today.orders + ' ventas · ' + dashCup(data.today.revenue));
+
+            const products = dashProducts();
+            if (products.length) {
+                const active = products.filter(p => p.active !== false);
+                const out = active.filter(p => p.stock === 0).length;
+                const low = active.filter(p => p.stock !== null && p.stock !== undefined && p.stock > 0 && p.stock <= DASH_LOW_STOCK).length;
+                set('kpiProducts', String(active.length));
+                set('kpiProductsSub', low + ' con stock bajo · ' + out + ' agotados');
+                set('kpiProductsTrend', (low + out) > 0
+                    ? '<span class="trend-down"><i class="fa-solid fa-triangle-exclamation"></i> ' + (low + out) + ' requieren reposición</span>'
+                    : '<span class="trend-up"><i class="fa-solid fa-circle-check"></i> Stock al día</span>');
+            }
+            refreshAdminBell();
+        }
+
+        /* ---------- Gráfico de ventas (SVG a mano, sin librerías) ---------- */
+        function dashSeries() {
+            const data = dashState.data;
+            if (!data) return [];
+            if (dashState.range === '6m') {
+                return data.series.months.map(m => ({ label: DASH_MONTHS_ES[m.month], long: DASH_MONTHS_LONG[m.month] + ' ' + m.key.slice(0, 4), revenue: m.revenue, profit: m.profit, orders: m.orders }));
+            }
+            const days = dashState.range === '7d' ? data.series.days.slice(-7) : data.series.days;
+            return days.map(d => {
+                const month = Number(d.key.slice(5, 7)) - 1;
+                const day = Number(d.key.slice(8, 10));
+                return { label: day + ' ' + DASH_MONTHS_ES[month], long: day + ' de ' + DASH_MONTHS_LONG[month], revenue: d.revenue, profit: d.profit, orders: d.orders };
+            });
+        }
+
+        function dashRenderChart() {
+            const host = dashEl('salesChart');
+            const tip = dashEl('salesTip');
+            const empty = dashEl('salesEmpty');
+            if (!host || !dashState.data) return;
+            const series = dashSeries();
+            const n = series.length;
+            const width = Math.max(host.clientWidth, 280);
+            const compact = width < 520;
+            const height = compact ? 220 : 260;
+            const pad = { l: compact ? 40 : 48, r: 14, t: 12, b: 28 };
+            const plotW = width - pad.l - pad.r;
+            const plotH = height - pad.t - pad.b;
+            const maxValue = Math.max.apply(null, series.map(s => Math.max(s.revenue, s.profit, 0)).concat([0]));
+            const step = dashNiceStep((maxValue || 1000) / 4);
+            const yMax = step * 4;
+            const x = i => pad.l + (n === 1 ? plotW / 2 : (i / (n - 1)) * plotW);
+            const y = v => pad.t + plotH - (Math.max(v, 0) / yMax) * plotH;
+            const baseline = pad.t + plotH;
+            const hasData = series.some(s => s.revenue > 0 || s.profit > 0);
+            if (empty) empty.classList.toggle('show', !hasData);
+
+            let svg = '<svg width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="Gráfico de ingresos y ganancia en CUP">';
+            svg += '<defs><linearGradient id="adAreaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" style="stop-color:var(--ad-c1);stop-opacity:0.32"/><stop offset="100%" style="stop-color:var(--ad-c1);stop-opacity:0"/></linearGradient></defs>';
+            for (let t = 0; t <= 4; t++) {
+                const v = step * t;
+                const yy = y(v);
+                svg += '<line class="chart-grid" x1="' + pad.l + '" x2="' + (width - pad.r) + '" y1="' + yy + '" y2="' + yy + '"/>';
+                svg += '<text class="chart-axis" x="' + (pad.l - 8) + '" y="' + (yy + 4) + '" text-anchor="end">' + dashCompact(v) + '</text>';
+            }
+            const every = n > 12 ? 5 : 1;
+            series.forEach((s, i) => {
+                if ((n - 1 - i) % every !== 0) return;
+                svg += '<text class="chart-axis" x="' + x(i) + '" y="' + (height - 8) + '" text-anchor="' + (i === 0 && n > 1 ? 'start' : i === n - 1 && n > 1 ? 'end' : 'middle') + '">' + dashEsc(s.label) + '</text>';
+            });
+            const line = key => series.map((s, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(s[key]).toFixed(1)).join(' ');
+            if (n > 1) {
+                svg += '<path d="' + line('revenue') + ' L' + x(n - 1).toFixed(1) + ',' + baseline + ' L' + x(0).toFixed(1) + ',' + baseline + ' Z" fill="url(#adAreaGrad)"/>';
+                svg += '<path d="' + line('profit') + '" fill="none" style="stroke:var(--ad-c3)" stroke-width="2" stroke-dasharray="5 4" stroke-linecap="round" stroke-linejoin="round"/>';
+                svg += '<path d="' + line('revenue') + '" fill="none" style="stroke:var(--ad-c1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+            }
+            if (n <= 12) {
+                series.forEach((s, i) => { svg += '<circle cx="' + x(i) + '" cy="' + y(s.revenue) + '" r="4" style="fill:var(--ad-c1);stroke:var(--ad-card)" stroke-width="2"/>'; });
+            }
+            svg += '<line id="salesCross" y1="' + pad.t + '" y2="' + baseline + '" style="stroke:var(--ad-muted)" stroke-width="1" stroke-dasharray="3 3" visibility="hidden"/>';
+            svg += '<circle id="salesDot" r="5.5" style="fill:var(--ad-c1);stroke:var(--ad-card)" stroke-width="2.5" visibility="hidden"/>';
+            svg += '<rect id="salesHit" x="' + pad.l + '" y="' + pad.t + '" width="' + plotW + '" height="' + plotH + '" fill="transparent" style="touch-action:pan-y;cursor:crosshair"/>';
+            svg += '</svg>';
+
+            /* Tabla equivalente para lectores de pantalla. */
+            let table = '<table class="sr-only"><caption>Ingresos y ganancia en CUP</caption><thead><tr><th>Periodo</th><th>Ingresos</th><th>Ganancia</th><th>Ventas</th></tr></thead><tbody>';
+            series.forEach(s => { table += '<tr><td>' + dashEsc(s.long) + '</td><td>' + dashCup(s.revenue) + '</td><td>' + dashCup(s.profit) + '</td><td>' + s.orders + '</td></tr>'; });
+            table += '</tbody></table>';
+
+            Array.from(host.querySelectorAll('svg, table')).forEach(el => el.remove());
+            host.insertAdjacentHTML('afterbegin', svg + table);
+
+            const hit = host.querySelector('#salesHit');
+            const cross = host.querySelector('#salesCross');
+            const dot = host.querySelector('#salesDot');
+            const show = evt => {
+                const rect = hit.getBoundingClientRect();
+                const ratio = rect.width ? (evt.clientX - rect.left) / rect.width : 0;
+                const i = n === 1 ? 0 : Math.min(n - 1, Math.max(0, Math.round(ratio * (n - 1))));
+                const s = series[i];
+                cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('visibility', 'visible');
+                dot.setAttribute('cx', x(i)); dot.setAttribute('cy', y(s.revenue)); dot.setAttribute('visibility', 'visible');
+                tip.innerHTML = '<b>' + dashEsc(s.long) + '</b><span>Ingresos <em>' + dashCup(s.revenue) + '</em></span><span>Ganancia <em>' + dashCup(s.profit) + '</em></span><span>Ventas <em>' + s.orders + '</em></span>';
+                tip.style.display = 'block';
+                const tipW = tip.offsetWidth;
+                const left = Math.min(Math.max(x(i) - tipW / 2, 0), width - tipW);
+                tip.style.left = left + 'px';
+                tip.style.top = Math.max(y(s.revenue) - tip.offsetHeight - 12, 0) + 'px';
+            };
+            const hide = () => { cross.setAttribute('visibility', 'hidden'); dot.setAttribute('visibility', 'hidden'); tip.style.display = 'none'; };
+            hit.addEventListener('pointermove', show);
+            hit.addEventListener('pointerdown', show);
+            hit.addEventListener('pointerleave', hide);
+        }
+
+        /* ---------- Reparto del mes (donut) ---------- */
+        function dashRenderSplit() {
+            const data = dashState.data;
+            const svg = dashEl('donutSvg');
+            const legend = dashEl('donutLegend');
+            if (!data || !svg || !legend) return;
+            const byPay = dashState.split === 'pay';
+            const src = byPay ? data.payment : data.origin;
+            const items = byPay
+                ? [{ label: 'Efectivo', v: src.cash, color: 'var(--ad-c1)' }, { label: 'Digital', v: src.digital, color: 'var(--ad-c2)' }, { label: 'Sin indicar', v: src.other, color: 'var(--ad-muted)' }]
+                : [{ label: 'Físico', v: src.physical, color: 'var(--ad-c1)' }, { label: 'Online', v: src.online, color: 'var(--ad-c2)' }, { label: 'Sin indicar', v: src.other, color: 'var(--ad-muted)' }];
+            const shown = items.filter((it, idx) => idx < 2 || it.v.count > 0);
+            const totalCup = shown.reduce((sum, it) => sum + it.v.cup, 0);
+            const totalCount = shown.reduce((sum, it) => sum + it.v.count, 0);
+            dashEl('splitPay').setAttribute('aria-pressed', byPay ? 'true' : 'false');
+            dashEl('splitOrigin').setAttribute('aria-pressed', byPay ? 'false' : 'true');
+            dashEl('splitSub').textContent = byPay ? 'Por método de pago' : 'Por origen de la venta';
+
+            const R = 44, C = 2 * Math.PI * R, GAP = 2.5;
+            let out = '<circle cx="60" cy="60" r="' + R + '" fill="none" style="stroke:var(--ad-card-2)" stroke-width="16"/>';
+            if (totalCup > 0) {
+                let offset = 0;
+                shown.forEach(it => {
+                    const len = (it.v.cup / totalCup) * C;
+                    if (len <= 0) return;
+                    const dash = Math.max(len - (shown.filter(s => s.v.cup > 0).length > 1 ? GAP : 0), 0.5);
+                    out += '<circle cx="60" cy="60" r="' + R + '" fill="none" stroke-width="16" style="stroke:' + it.color + '" stroke-dasharray="' + dash.toFixed(2) + ' ' + (C - dash).toFixed(2) + '" stroke-dashoffset="' + (-offset).toFixed(2) + '" transform="rotate(-90 60 60)"/>';
+                    offset += len;
+                });
+            }
+            out += '<text x="60" y="60" text-anchor="middle" style="fill:var(--ad-text)" font-size="20" font-weight="800">' + totalCount + '</text>';
+            out += '<text x="60" y="75" text-anchor="middle" style="fill:var(--ad-muted)" font-size="9">' + (totalCount === 1 ? 'venta' : 'ventas') + '</text>';
+            svg.innerHTML = out;
+            svg.setAttribute('aria-label', 'Reparto de las ventas del mes: ' + shown.map(it => it.label + ' ' + (totalCup ? Math.round(it.v.cup / totalCup * 100) : 0) + '%').join(', '));
+
+            legend.innerHTML = shown.map(it => {
+                const pct = totalCup ? Math.round((it.v.cup / totalCup) * 100) : 0;
+                return '<li><span class="dot" style="background:' + it.color + '"></span><span>' + it.label + '<small>' + it.v.count + (it.v.count === 1 ? ' venta' : ' ventas') + ' · ' + dashCup(it.v.cup) + '</small></span><b>' + pct + '%</b></li>';
+            }).join('');
+        }
+
+        /* ---------- Ventas recientes y finanzas ---------- */
+        function dashRenderRecent() {
+            const body = dashEl('recentBody');
+            if (!body) return;
+            const rows = dashState.sales.slice(0, 7);
+            if (!rows.length) { body.innerHTML = '<tr><td colspan="5" class="tbl-empty">Todavía no hay ventas registradas.</td></tr>'; return; }
+            body.innerHTML = rows.map(s => {
+                const idText = String(s.id == null ? '' : s.id);
+                const shortId = idText.length > 8 ? idText.slice(-6).toUpperCase() : idText;
+                const method = String(s.payment_method || '').trim().toUpperCase();
+                const pay = method === 'EFECTIVO' ? '<span class="pill pill-cash"><i class="fa-solid fa-money-bill-wave"></i> Efectivo</span>'
+                    : method === 'DIGITAL' ? '<span class="pill pill-digital"><i class="fa-solid fa-credit-card"></i> Digital</span>'
+                    : '<span class="pill pill-neutral">' + (dashEsc(s.payment_method) || '—') + '</span>';
+                const origin = String(s.origin || '').trim().toUpperCase();
+                const originText = (origin === 'FISICO' || origin === 'FÍSICO') ? 'Físico' : origin === 'ONLINE' ? 'Online' : (dashEsc(s.origin) || '—');
+                return '<tr><td class="id">#' + dashEsc(shortId) + '</td><td>' + dashDateTime(s.created_at) + '</td><td class="col-origin">' + originText + '</td><td>' + pay + '</td><td class="num">' + dashCup(s.total_cup) + '</td></tr>';
+            }).join('');
+        }
+
+        function dashRenderFinance() {
+            const body = dashEl('finBody');
+            const data = dashState.data;
+            if (!body || !data) return;
+            const t = data.today, m = data.month;
+            const signed = v => '<span class="' + (v < 0 ? 'fin-neg' : 'fin-pos') + '">' + dashCup(v) + '</span>';
+            body.innerHTML =
+                '<tr><td>Ventas</td><td class="num">' + dashCup(t.revenue) + '</td><td class="num">' + dashCup(m.revenue) + '</td></tr>' +
+                '<tr><td>Ventas (USD)</td><td class="num">' + dashUsd(t.usd) + '</td><td class="num">' + dashUsd(m.usd) + '</td></tr>' +
+                '<tr><td>Ganancia bruta</td><td class="num">' + dashCup(t.profit) + '</td><td class="num">' + dashCup(m.profit) + '</td></tr>' +
+                '<tr><td>Gastos</td><td class="num">' + dashCup(t.expenses) + '</td><td class="num">' + dashCup(m.expenses) + '</td></tr>' +
+                '<tr class="total"><td>Balance neto</td><td class="num">' + signed(t.net) + '</td><td class="num">' + signed(m.net) + '</td></tr>';
+        }
+
+        /* ---------- Más vendidos (unidades del mes) ---------- */
+        function dashRenderTop() {
+            const list = dashEl('topList');
+            if (!list) return;
+            const state = dashState.top;
+            const note = text => { list.innerHTML = '<li class="tbl-empty">' + text + '</li>'; };
+            if (!state) return note('Cargando…');
+            if (state.error) return note('El detalle de ventas por producto no está disponible todavía.');
+            if (!state.items.length) return note('Sin ventas este mes.');
+            const max = state.items[0].units || 1;
+            const byId = new Map(dashProducts().map(p => [p.id, p]));
+            list.innerHTML = state.items.map(it => {
+                const p = byId.get(it.id);
+                const name = p ? p.name : 'Producto #' + it.id;
+                const thumb = p && p.image ? '<img src="' + dashEsc(p.image) + '" alt="" loading="lazy">' : '<i class="fa-solid fa-box"></i>';
+                return '<li class="top-item"><span class="top-thumb">' + thumb + '</span><div style="min-width:0;"><div class="top-name" title="' + dashEsc(name) + '">' + dashEsc(name) + '</div><div class="top-bar"><i style="width:' + Math.max(4, Math.round(it.units / max * 100)) + '%"></i></div></div><span class="top-units"><b>' + it.units + '</b> uds</span></li>';
+            }).join('');
+        }
+
+        async function dashLoadTop(client, monthSales) {
+            const core = window.VentasCelCore;
+            dashState.top = null;
+            dashRenderTop();
             try {
-                const client = await waitForSupabaseClient();
-                const today = new Date();
-                const todayKey = today.toISOString().slice(0, 10);
-                const monthKey = today.toISOString().slice(0, 7);
-                const core = window.VentasCelCore || {};
-                const salesRes = await client.from('sales').select('id, created_at, origin, payment_method, total_cup, total_usd, total_profit').order('created_at', { ascending: false }).limit(10);
-                const salesRows = Array.isArray(salesRes.data) ? salesRes.data : [];
-                const expensesRes = await client.from('expenses').select('*').order('created_at', { ascending: false });
-                const expensesRows = Array.isArray(expensesRes.data) ? expensesRes.data : [];
-                const salesSummary = (typeof core.salesSummary === 'function') ? core.salesSummary(salesRows, { todayKey, monthKey }) : { cupToday:0, cupMonth:0, usdToday:0, usdMonth:0, profitToday:0, profitMonth:0 };
-                const paymentBreakdown = (typeof core.paymentBreakdown === 'function') ? core.paymentBreakdown(salesRows) : { cashCup:0, digitalCup:0, cashCount:0, digitalCount:0 };
-                const originBreakdown = (typeof core.originBreakdown === 'function') ? core.originBreakdown(salesRows) : { onlineCup:0, physicalCup:0, onlineCount:0, physicalCount:0 };
-                const expensesSummary = (typeof core.expensesSummary === 'function') ? core.expensesSummary(expensesRows, { todayKey, monthKey }) : { cupToday:0, cupMonth:0 };
-                const netBalance = (typeof core.netBalance === 'function') ? core.netBalance(salesRows, expensesRows, { todayKey, monthKey }) : { cupToday:0, cupMonth:0 };
-                const fmt = (n) => (typeof n === 'number' ? n.toFixed(2) : '0.00');
-                const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-                set('dash-cup-today', fmt(salesSummary.cupToday));
-                set('dash-usd-today', fmt(salesSummary.usdToday));
-                set('dash-cup-month', fmt(salesSummary.cupMonth));
-                set('dash-usd-month', fmt(salesSummary.usdMonth));
-                set('dash-profit-today', fmt(salesSummary.profitToday));
-                set('dash-profit-month', fmt(salesSummary.profitMonth));
-                set('dash-pay-cash', fmt(paymentBreakdown.cashCup) + ' / ' + fmt(paymentBreakdown.cashCup));
-                set('dash-pay-digital', fmt(paymentBreakdown.digitalCup) + ' / ' + fmt(paymentBreakdown.digitalCup));
-                set('dash-origin-physical', fmt(originBreakdown.physicalCup) + ' / ' + fmt(originBreakdown.physicalCup));
-                set('dash-origin-online', fmt(originBreakdown.onlineCup) + ' / ' + fmt(originBreakdown.onlineCup));
-                set('dash-net-today', fmt(netBalance.cupToday));
-                set('dash-net-month', fmt(netBalance.cupMonth));
-                const listEl = document.getElementById('dash-sales-list');
-                if (listEl) {
-                    if (!salesRows.length) {
-                        listEl.innerHTML = '<div style="color:var(--text-secondary);">No hay ventas registradas.</div>';
-                    } else {
-                        listEl.innerHTML = '<table style="width:100%; border-collapse:collapse; font-size:0.78rem;"><thead><tr style="text-align:left;"><th>id</th><th>Fecha</th><th>Origen</th><th>Pago</th><th>CUP</th><th>USD</th></tr></thead><tbody>' + salesRows.slice(0, 7).map(s => {
-                            const d = (s.created_at || '').slice(0, 10);
-                            return '<tr style="border-top:1px solid var(--border);"><td style="padding:0.15rem 0.2rem;">' + (s.id || '') + '</td><td style="padding:0.15rem 0.2rem;">' + d + '</td><td style="padding:0.15rem 0.2rem;">' + (s.origin || '') + '</td><td style="padding:0.15rem 0.2rem;">' + (s.payment_method || '') + '</td><td style="padding:0.15rem 0.2rem;">' + fmt(s.total_cup) + '</td><td style="padding:0.15rem 0.2rem;">' + fmt(s.total_usd) + '</td></tr>';
-                        }).join('') + '</tbody></table>';
-                    }
+                const ids = monthSales.map(s => s.id).filter(id => id !== null && id !== undefined);
+                const lines = [];
+                for (let i = 0; i < ids.length && i < 1000; i += 100) {
+                    const { data, error } = await client.from('sale_items').select('product_id, qty').in('sale_id', ids.slice(i, i + 100));
+                    if (error) throw error;
+                    if (Array.isArray(data)) lines.push.apply(lines, data);
                 }
+                dashState.top = { items: core.topProductsByUnits(lines, 5), error: false };
+            } catch (e) {
+                dashState.top = { items: [], error: true };
+            }
+            dashRenderTop();
+        }
+
+        async function loadDashboard() {
+            if (dashState.loading) return;
+            const root = dashEl('dashRoot');
+            const errorEl = dashEl('dashError');
+            dashState.loading = true;
+            if (root) root.classList.add('is-loading');
+            if (errorEl) errorEl.classList.remove('show');
+            try {
+                const core = window.VentasCelCore;
+                if (!core || typeof core.dashboardData !== 'function') throw new Error('No se cargó catalog-core.js.');
+                const client = await waitForSupabaseClient();
+                const now = new Date();
+                const todayKey = dashTodayKey(now);
+                const tz = now.getTimezoneOffset();
+                const startIso = new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString();
+
+                const [sales, expenses, productsRes, rateRes] = await Promise.all([
+                    dashFetchAll(() => client.from('sales').select('id, created_at, origin, payment_method, total_cup, total_usd, total_profit').gte('created_at', startIso).order('created_at', { ascending: false })),
+                    dashFetchAll(() => client.from('expenses').select('id, created_at, amount_cup').gte('created_at', startIso).order('created_at', { ascending: false })),
+                    client.from('products').select('*').limit(2000).then(r => r, () => null),
+                    client.from('settings').select('exchange_rate').eq('id', 1).single().then(r => r, () => null)
+                ]);
+
+                if (productsRes && Array.isArray(productsRes.data)) {
+                    dashState.products = productsRes.data.map(core.mapRowToProduct).filter(Boolean);
+                }
+                const rate = rateRes && rateRes.data ? Number(rateRes.data.exchange_rate) : NaN;
+                dashState.rate = Number.isFinite(rate) && rate > 0 ? rate : null;
+                const rateEl = dashEl('adSideRate');
+                if (rateEl) rateEl.textContent = (dashState.rate ? String(dashState.rate).replace('.', ',') : '820') + ' CUP = 1 USD' + (dashState.rate ? '' : ' (por defecto)');
+
+                dashState.sales = sales;
+                dashState.data = core.dashboardData(sales, expenses, { todayKey: todayKey, tzOffsetMin: tz, months: 6, days: 30 });
+
+                dashRenderKpis();
+                dashRenderChart();
+                dashRenderSplit();
+                dashRenderRecent();
+                dashRenderFinance();
+                const stamp = dashPad(now.getHours()) + ':' + dashPad(now.getMinutes());
+                dashEl('dashUpdated').textContent = 'Actualizado a las ' + stamp + ' · ' + now.getDate() + ' de ' + DASH_MONTHS_LONG[now.getMonth()] + ' de ' + now.getFullYear();
+                const monthKey = todayKey.slice(0, 7);
+                const monthSales = sales.filter(s => core.localDateKey(s.created_at, tz).slice(0, 7) === monthKey);
+                dashLoadTop(client, monthSales);
             } catch (e) {
                 const msg = (e && typeof e.message === 'string') ? e.message : String(e);
-                const listEl = document.getElementById('dash-sales-list');
-                if (listEl) listEl.innerHTML = '<div style="color:var(--danger);">Error cargando dashboard: ' + msg.replace(/</g,'&lt;') + '</div>';
+                if (errorEl) { errorEl.textContent = 'No se pudieron cargar los datos del dashboard: ' + msg; errorEl.classList.add('show'); }
+                dashEl('dashUpdated').textContent = 'Sin conexión con la base de datos';
+            } finally {
+                dashState.loading = false;
+                if (root) root.classList.remove('is-loading');
             }
         }
+
+        /* ---------- Cableado del panel (menú, búsqueda, controles) ---------- */
+        (function initAdminShell() {
+            const panel = dashEl('adminPanelView');
+            if (!panel) return;
+            const closeMenu = () => panel.classList.remove('ad-open');
+            dashEl('adminMenuBtn').addEventListener('click', () => panel.classList.toggle('ad-open'));
+            dashEl('adminScrim').addEventListener('click', closeMenu);
+            dashEl('adminThemeBtn').addEventListener('click', () => { const t = dashEl('themeToggle'); if (t) t.click(); setTimeout(dashRenderChart, 0); });
+            dashEl('dashRefreshBtn').addEventListener('click', loadDashboard);
+            dashEl('salesRange').addEventListener('change', e => { dashState.range = e.target.value; dashRenderChart(); });
+            dashEl('splitPay').addEventListener('click', () => { dashState.split = 'pay'; dashRenderSplit(); });
+            dashEl('splitOrigin').addEventListener('click', () => { dashState.split = 'origin'; dashRenderSplit(); });
+            dashEl('adminBellBtn').addEventListener('click', () => {
+                refreshAdminBell();
+                const count = Number(dashEl('adminBellBadge').textContent) || 0;
+                switchAdminTab('productos');
+                if (typeof showToast === 'function') showToast(count ? count + ' productos con stock bajo o agotados.' : 'El stock está al día.', count ? 'error' : 'success');
+            });
+            /* El buscador de la cabecera filtra la lista de productos. */
+            dashEl('adminGlobalSearch').addEventListener('input', e => {
+                const target = dashEl('adminSearchInput');
+                if (!target) return;
+                switchAdminTab('productos');
+                target.value = e.target.value;
+                target.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+            /* El subtítulo de Productos sigue al contador que ya mantiene el panel. */
+            const counter = dashEl('adminProductCount');
+            if (counter && 'MutationObserver' in window) {
+                new MutationObserver(() => { if (adCurrentTab === 'productos') updateAdminTitle('productos'); }).observe(counter, { childList: true, characterData: true, subtree: true });
+            }
+            let resizeTimer = null;
+            window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (adCurrentTab === 'dashboard') dashRenderChart(); }, 120); });
+        })();
 
         // Al cambiar de pestaña, refrescar datos del POS
         const originalSwitchAdminTab = window.switchAdminTab || function(){};
         window.switchAdminTab = function(name) {
             (originalSwitchAdminTab || window.switchAdminTab)(name);
+            refreshAdminBell();
             if (name === 'pos') {
                 setTimeout(initPos, 50);
             }
@@ -5898,5 +6713,6 @@
             }
         };
     </script>
+
 </body>
 </html>
