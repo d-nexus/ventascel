@@ -622,6 +622,105 @@
             gap: 2rem;
         }
 
+        /* Portada: bloques por categoría con una muestra aleatoria */
+        .category-block {
+            grid-column: 1 / -1;
+        }
+
+        .category-block + .category-block {
+            margin-top: 1.5rem;
+        }
+
+        .category-block-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.85rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .category-block-title {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .category-block-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: var(--accent-glow);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            flex-shrink: 0;
+        }
+
+        .category-block-title small {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-top: 0.1rem;
+        }
+
+        .view-all-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            padding: 0.6rem 1.25rem;
+            border-radius: 999px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+
+        .view-all-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .category-block-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .category-view-head {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .category-view-head strong {
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 640px) {
+            .category-block-head { flex-wrap: wrap; }
+            .category-block-title { font-size: 1.15rem; }
+        }
+
         .product-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -4016,9 +4115,9 @@
             });
         }
 
-        function filterByCategory(categoryName) {
-            currentCategory = currentCategory === categoryName ? "Todos" : categoryName;
-            
+        function filterByCategory(categoryName, forceAll = false) {
+            currentCategory = (forceAll || currentCategory === categoryName) ? "Todos" : categoryName;
+
             document.querySelectorAll('.filter-pill').forEach(pill => {
                 if (pill.getAttribute('data-category') === currentCategory) {
                     pill.classList.add('active');
@@ -4029,6 +4128,11 @@
 
             renderCategories();
             renderProducts();
+
+            /* Lleva al visitante al inicio del catálogo para que vea el
+               resultado del cambio de vista. */
+            const section = document.getElementById('productos');
+            if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         /* ------------------------------------------
@@ -4074,7 +4178,7 @@
                 return;
             }
 
-            grid.innerHTML = filtered.map(product => {
+            const renderCard = (product) => {
                 /* Coerción defensiva: aunque un producto llegue con
                    campos ausentes o de tipo incorrecto, la tarjeta
                    siempre se pinta y el grid nunca queda en blanco. */
@@ -4136,7 +4240,92 @@
                         </div>
                     </div>
                 `;
+            };
+
+            /* Portada (sin categoría ni búsqueda): una muestra aleatoria
+               por categoría. Con una categoría elegida o una búsqueda se
+               muestra el listado completo. */
+            const isHome = currentCategory === 'Todos' && !searchQuery;
+            if (isHome) {
+                grid.innerHTML = buildHomeSections(filtered, renderCard, core);
+            } else {
+                const head = currentCategory !== 'Todos' && !searchQuery
+                    ? `<div class="category-view-head">
+                           <span>Mostrando <strong>${filtered.length}</strong> ${filtered.length === 1 ? 'producto' : 'productos'} en <strong>${escapeHtmlAttr(currentCategory)}</strong></span>
+                           <button type="button" class="view-all-btn" onclick="filterByCategory('${escapeJsString(currentCategory)}', true)">
+                               <i class="fa-solid fa-arrow-left"></i> Volver a la selección
+                           </button>
+                       </div>`
+                    : '';
+                grid.innerHTML = head + filtered.map(renderCard).join('');
+            }
+        }
+
+        /* ------------------------------------------
+           PORTADA: MUESTRA ALEATORIA POR CATEGORÍA
+           El orden aleatorio se fija una vez al abrir la web (no
+           cambia al repintar por filtros o por la llegada del
+           catálogo de la base de datos) y es distinto en cada visita.
+           Los productos agotados quedan al final de su categoría.
+           ------------------------------------------ */
+        const HOME_PRODUCTS_PER_CATEGORY = 4;
+        const homeRandomRank = new Map();
+
+        function getHomeRank(product) {
+            const key = Number(product.id);
+            if (!homeRandomRank.has(key)) homeRandomRank.set(key, Math.random());
+            return homeRandomRank.get(key);
+        }
+
+        function escapeHtmlAttr(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        function escapeJsString(value) {
+            return String(value == null ? '' : value).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        function buildHomeSections(filtered, renderCard, core) {
+            const categories = getAllCategories();
+            const unavailable = (p) => core && typeof core.isSoldOut === 'function' ? core.isSoldOut(p) : false;
+
+            const blocks = categories.map(catName => {
+                const inCategory = filtered.filter(p => String(p.category || '') === catName);
+                if (!inCategory.length) return '';
+
+                const sample = inCategory
+                    .slice()
+                    .sort((a, b) => (unavailable(a) - unavailable(b)) || (getHomeRank(a) - getHomeRank(b)))
+                    .slice(0, HOME_PRODUCTS_PER_CATEGORY);
+
+                /* Con un orden elegido distinto de «Destacados» la muestra
+                   respeta ese orden; con «Destacados» se queda aleatoria. */
+                if (currentSort !== 'featured') {
+                    sample.sort((a, b) => filtered.indexOf(a) - filtered.indexOf(b));
+                }
+
+                const total = inCategory.length;
+                const hidden = total - sample.length;
+                const safeName = escapeHtmlAttr(catName);
+                return `
+                    <div class="category-block">
+                        <div class="category-block-head">
+                            <div class="category-block-title">
+                                <span class="category-block-icon"><i class="fa-solid ${getCategoryIcon(catName)}"></i></span>
+                                <div>${safeName}<small>${total} ${total === 1 ? 'producto' : 'productos'}</small></div>
+                            </div>
+                            ${hidden > 0 ? `<button type="button" class="view-all-btn" onclick="filterByCategory('${escapeJsString(catName)}')">
+                                Ver todos <i class="fa-solid fa-arrow-right"></i>
+                            </button>` : ''}
+                        </div>
+                        <div class="category-block-grid">
+                            ${sample.map(renderCard).join('')}
+                        </div>
+                    </div>`;
             }).join('');
+
+            /* Productos con una categoría fuera de la lista: no se pierden. */
+            return blocks || filtered.slice(0, HOME_PRODUCTS_PER_CATEGORY * 2).map(renderCard).join('');
         }
 
         /* ------------------------------------------
